@@ -1,11 +1,13 @@
 package com.halilibo.richtext.markdown
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -52,9 +54,12 @@ import com.halilibo.richtext.ui.string.richTextString
 public fun RichTextScope.Markdown(
   content: String,
   markdownParseOptions: MarkdownParseOptions = MarkdownParseOptions.Default,
-  onLinkClicked: ((String) -> Unit)? = null
+  onLinkClicked: ((String) -> Unit)? = null,
+  onMediaCompose: (@Composable (String, String) -> Unit)? = null,
 ) {
   val onLinkClickedState = rememberUpdatedState(onLinkClicked)
+  val onMediaComposeState = rememberUpdatedState(onMediaCompose)
+
   // Can't use UriHandlerAmbient.current::openUri here,
   // see https://issuetracker.google.com/issues/172366483
   val realLinkClickedHandler = onLinkClickedState.value ?: LocalUriHandler.current.let {
@@ -62,7 +67,20 @@ public fun RichTextScope.Markdown(
       { url -> it.openUri(url) }
     }
   }
-  CompositionLocalProvider(LocalOnLinkClicked provides realLinkClickedHandler) {
+
+  val realAstImageComposer = onMediaComposeState.value ?: { title, destination ->
+    RemoteImage(
+      url = destination,
+      contentDescription = title,
+      modifier = Modifier.fillMaxWidth(),
+      contentScale = ContentScale.Inside
+    )
+  }
+
+  CompositionLocalProvider(
+    LocalOnLinkClicked provides realLinkClickedHandler,
+    LocalOnAstImageCompose provides realAstImageComposer
+  ) {
     val markdownAst = parsedMarkdownAst(text = content, options = markdownParseOptions)
     RecursiveRenderMarkdownAst(astNode = markdownAst)
   }
@@ -206,3 +224,13 @@ internal fun RichTextScope.visitChildren(node: AstNode?) {
  */
 internal val LocalOnLinkClicked =
   compositionLocalOf<(String) -> Unit> { error("OnLinkClicked is not provided") }
+
+/**
+ * An internal ambient to pass through OnImageCompose function from root [Markdown] composable
+ * to children that render images. Although being explicit is preferred, recursive calls to
+ * [visitChildren] increases verbosity with each extra argument.
+ */
+internal val LocalOnAstImageCompose =
+  compositionLocalOf<@Composable (String, String) -> Unit> {
+    @Composable { _: String, _: String -> error("OnMediaComposer is not provided") }
+  }

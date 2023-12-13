@@ -57,7 +57,10 @@ import com.halilibo.richtext.ui.resolveDefaults
   }
   LaunchedEffect(isAutolinkEnabled) {
     markdownParseOptions = markdownParseOptions.copy(
-      autolink = isAutolinkEnabled
+      autolink = isAutolinkEnabled,
+      isImage = {
+        it.contains("image%2Fjpeg")
+      }
     )
   }
 
@@ -158,6 +161,8 @@ private val sampleMarkdown = """
   ##### Header 5
   ###### Header 6
   ---
+  
+  https://image.nostr.build/40ae418ccc5336e17b5949bacc11c31835603437816f8bf867c171f07d34dd54.jpg#m=image%2Fjpeg&dim=720x1612&blurhash=%5BLFFgJMyj%5Bt74TMyoft70LxufiV%5B_Nt7f6WB4TogoMj%5Bxut7ofWAS%7EofbFjtD%25xtWBWBs%2BM%7BjbbH&x=c3a3f49c017f58749226f8ae6021c11a745d2354f52a229cb99eef4a9d20ec39
   
   ## Full-bleed Image
   ![](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png)

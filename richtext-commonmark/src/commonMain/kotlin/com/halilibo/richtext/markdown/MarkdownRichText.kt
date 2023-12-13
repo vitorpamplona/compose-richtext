@@ -31,6 +31,7 @@ import com.halilibo.richtext.ui.string.InlineContent
 import com.halilibo.richtext.ui.string.RichTextString
 import com.halilibo.richtext.ui.string.Text
 import com.halilibo.richtext.ui.string.withFormat
+import java.util.regex.Pattern
 
 /**
  * Only render the text content that exists below [astNode]. All the content blocks
@@ -56,11 +57,16 @@ import com.halilibo.richtext.ui.string.withFormat
  * @param astNode Root node to accept as Text Content container.
  */
 @Composable
-internal fun RichTextScope.MarkdownRichText(astNode: AstNode, modifier: Modifier = Modifier) {
+internal fun RichTextScope.MarkdownRichText(
+  astNode: AstNode,
+  modifier: Modifier = Modifier
+) {
   val onLinkClicked = LocalOnLinkClicked.current
+  val onMediaCompose = LocalOnAstImageCompose.current
+
   // Assume that only RichText nodes reside below this level.
-  val richText = remember(astNode, onLinkClicked) {
-    computeRichTextString(astNode, onLinkClicked)
+  val richText = remember(astNode, onMediaCompose, onLinkClicked) {
+    computeRichTextString(astNode, onMediaCompose, onLinkClicked)
   }
 
   Text(text = richText, modifier = modifier)
@@ -68,6 +74,7 @@ internal fun RichTextScope.MarkdownRichText(astNode: AstNode, modifier: Modifier
 
 private fun computeRichTextString(
   astNode: AstNode,
+  onRenderImage: @Composable (String, String) -> Unit,
   onLinkClicked: (String) -> Unit
 ): RichTextString {
   val richTextStringBuilder = RichTextString.Builder()
@@ -104,12 +111,7 @@ private fun computeRichTextString(
                 IntSize(128.dp.roundToPx(), 128.dp.roundToPx())
               }
             ) {
-              RemoteImage(
-                url = currentNodeType.destination,
-                contentDescription = currentNodeType.title,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Inside
-              )
+              onRenderImage(currentNodeType.title, currentNodeType.destination)
             }
           )
           null
