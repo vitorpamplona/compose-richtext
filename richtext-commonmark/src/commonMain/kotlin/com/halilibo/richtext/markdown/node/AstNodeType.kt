@@ -126,6 +126,11 @@ internal data class AstLink(
 ) : AstInlineNodeType()
 
 @Immutable
+internal data class AstNostrUri(
+  val destination: String
+) : AstInlineNodeType()
+
+@Immutable
 internal data class AstImage(
   val title: String,
   val destination: String

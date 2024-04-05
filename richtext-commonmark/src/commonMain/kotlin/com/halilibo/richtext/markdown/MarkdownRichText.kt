@@ -19,6 +19,7 @@ import com.halilibo.richtext.markdown.node.AstLink
 import com.halilibo.richtext.markdown.node.AstLinkReferenceDefinition
 import com.halilibo.richtext.markdown.node.AstListItem
 import com.halilibo.richtext.markdown.node.AstNode
+import com.halilibo.richtext.markdown.node.AstNostrUri
 import com.halilibo.richtext.markdown.node.AstParagraph
 import com.halilibo.richtext.markdown.node.AstSoftLineBreak
 import com.halilibo.richtext.markdown.node.AstStrikethrough
@@ -63,10 +64,11 @@ internal fun RichTextScope.MarkdownRichText(
 ) {
   val onLinkClicked = LocalOnLinkClicked.current
   val onMediaCompose = LocalOnAstImageCompose.current
+  val onNostrUriCompose = LocalOnNostrUriCompose.current
 
   // Assume that only RichText nodes reside below this level.
-  val richText = remember(astNode, onMediaCompose, onLinkClicked) {
-    computeRichTextString(astNode, onMediaCompose, onLinkClicked)
+  val richText = remember(astNode, onMediaCompose, onNostrUriCompose, onLinkClicked) {
+    computeRichTextString(astNode, onMediaCompose, onNostrUriCompose, onLinkClicked)
   }
 
   Text(text = richText, modifier = modifier)
@@ -75,7 +77,8 @@ internal fun RichTextScope.MarkdownRichText(
 private fun computeRichTextString(
   astNode: AstNode,
   onRenderImage: @Composable (String, String) -> Unit,
-  onLinkClicked: (String) -> Unit
+  onNostrUriCompose: (@Composable (String) -> Unit)?,
+  onLinkClicked: (String) -> Unit,
 ): RichTextString {
   val richTextStringBuilder = RichTextString.Builder()
 
@@ -115,6 +118,27 @@ private fun computeRichTextString(
             }
           )
           null
+        }
+        is AstNostrUri -> {
+          if (onNostrUriCompose != null) {
+            richTextStringBuilder.appendInlineContent(
+              content = InlineContent(
+                initialSize = {
+                  IntSize(128.dp.roundToPx(), 128.dp.roundToPx())
+                }
+              ) {
+                onNostrUriCompose(currentNodeType.destination)
+              }
+            )
+            null
+          } else {
+            richTextStringBuilder.pushFormat(RichTextString.Format.Link(
+              onClick = { onLinkClicked(currentNodeType.destination) }
+            ))
+            richTextStringBuilder.append(currentNodeType.destination)
+            richTextStringBuilder.pop()
+            null
+          }
         }
         is AstLink -> richTextStringBuilder.pushFormat(RichTextString.Format.Link(
           onClick = { onLinkClicked(currentNodeType.destination) }

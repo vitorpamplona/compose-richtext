@@ -7,11 +7,13 @@ package com.halilibo.richtext.markdown
  */
 public data class MarkdownParseOptions(
   val autolink: Boolean,
+  val nostrlink: Boolean = false,
   val isImage: (link: String) -> Boolean
 ) {
   public companion object {
     public val Default: MarkdownParseOptions = MarkdownParseOptions(
       autolink = true,
+      nostrlink = false,
       isImage = { false }
     )
   }

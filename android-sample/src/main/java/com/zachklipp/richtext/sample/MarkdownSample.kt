@@ -1,12 +1,17 @@
 package com.zachklipp.richtext.sample
 
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -25,6 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +55,7 @@ import com.halilibo.richtext.ui.resolveDefaults
   var isWordWrapEnabled by remember { mutableStateOf(true) }
   var markdownParseOptions by remember { mutableStateOf(MarkdownParseOptions.Default) }
   var isAutolinkEnabled by remember { mutableStateOf(true) }
+  var isAutoNostrLinkEnabled by remember { mutableStateOf(true) }
 
   LaunchedEffect(isWordWrapEnabled) {
     richTextStyle = richTextStyle.copy(
@@ -55,9 +64,10 @@ import com.halilibo.richtext.ui.resolveDefaults
       )
     )
   }
-  LaunchedEffect(isAutolinkEnabled) {
+  LaunchedEffect(isAutolinkEnabled, isAutoNostrLinkEnabled) {
     markdownParseOptions = markdownParseOptions.copy(
       autolink = isAutolinkEnabled,
+      nostrlink = isAutoNostrLinkEnabled,
       isImage = {
         it.contains("image%2Fjpeg")
       }
@@ -97,6 +107,14 @@ import com.halilibo.richtext.ui.resolveDefaults
               label = "Autolink"
             )
 
+            CheckboxPreference(
+              onClick = {
+                isAutoNostrLinkEnabled = !isAutoNostrLinkEnabled
+              },
+              checked = isAutoNostrLinkEnabled,
+              label = "Nostrlink"
+            )
+
             RichTextStyleConfig(
               richTextStyle = richTextStyle,
               onChanged = { richTextStyle = it }
@@ -116,6 +134,11 @@ import com.halilibo.richtext.ui.resolveDefaults
                   markdownParseOptions = markdownParseOptions,
                   onLinkClicked = {
                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                  },
+                  onNostrCompose = {
+                    Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
+                      Text("Cool rendering of ${it}")
+                    }
                   }
                 )
               }
@@ -163,6 +186,8 @@ private val sampleMarkdown = """
   ---
   
   https://image.nostr.build/40ae418ccc5336e17b5949bacc11c31835603437816f8bf867c171f07d34dd54.jpg#m=image%2Fjpeg&dim=720x1612&blurhash=%5BLFFgJMyj%5Bt74TMyoft70LxufiV%5B_Nt7f6WB4TogoMj%5Bxut7ofWAS%7EofbFjtD%25xtWBWBs%2BM%7BjbbH&x=c3a3f49c017f58749226f8ae6021c11a745d2354f52a229cb99eef4a9d20ec39
+  
+  Here is my nostr nostr:nevent1qqsw9ra6kyw8a58rs4h5fqrars2ga87zaaxpm3vtl5qdj473d9d23wgpz3mhxue69uhhyetvv9ujuerpd46hxtnfdupzpef89h53f0fsza2ugwdc3e54nfpun5nxfqclpy79r6w8nxsk5yp0qvzqqqqqqyvd5c8m uri
   
   ## Full-bleed Image
   ![](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png)

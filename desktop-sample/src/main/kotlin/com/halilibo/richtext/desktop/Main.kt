@@ -2,8 +2,10 @@ package com.halilibo.richtext.desktop
 
 import androidx.compose.foundation.LocalScrollbarStyle
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.defaultScrollbarStyle
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -91,10 +93,16 @@ fun main(): Unit = singleWindowApplication(
                 content = text,
                 markdownParseOptions = MarkdownParseOptions(
                   true,
+                  true,
                   isImage = {
                     it.contains("image%2Fjpeg")
                   }
-                )
+                ),
+                onNostrCompose = {
+                  Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
+                    Text("Cool rendering of ${it}")
+                  }
+                }
               )
             }
           }
@@ -205,6 +213,8 @@ private val sampleMarkdown = """
   On LineHeight bug, the image below goes over this text. 
   ![](https://cdn.nostr.build/p/PxZ0.jpg)
 
+  Here is my nostr nostr:nevent1qqsw9ra6kyw8a58rs4h5fqrars2ga87zaaxpm3vtl5qdj473d9d23wgpz3mhxue69uhhyetvv9ujuerpd46hxtnfdupzpef89h53f0fsza2ugwdc3e54nfpun5nxfqclpy79r6w8nxsk5yp0qvzqqqqqqyvd5c8m uri
+  
   ---
 
   ## Emphasis

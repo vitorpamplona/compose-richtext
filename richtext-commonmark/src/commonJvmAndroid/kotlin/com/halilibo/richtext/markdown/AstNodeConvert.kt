@@ -22,6 +22,7 @@ import com.halilibo.richtext.markdown.node.AstListItem
 import com.halilibo.richtext.markdown.node.AstNode
 import com.halilibo.richtext.markdown.node.AstNodeLinks
 import com.halilibo.richtext.markdown.node.AstNodeType
+import com.halilibo.richtext.markdown.node.AstNostrUri
 import com.halilibo.richtext.markdown.node.AstOrderedList
 import com.halilibo.richtext.markdown.node.AstParagraph
 import com.halilibo.richtext.markdown.node.AstSoftLineBreak
@@ -65,6 +66,7 @@ import org.commonmark.node.Link
 import org.commonmark.node.LinkReferenceDefinition
 import org.commonmark.node.ListItem
 import org.commonmark.node.Node
+import org.commonmark.node.NostrUri
 import org.commonmark.node.OrderedList
 import org.commonmark.node.Paragraph
 import org.commonmark.node.SoftLineBreak
@@ -140,6 +142,9 @@ internal fun convert(
         )
       }
     }
+    is NostrUri -> AstNostrUri(
+      destination = node.destination
+    )
     is ListItem -> AstListItem
     is OrderedList -> AstOrderedList(
       startNumber = node.startNumber,
@@ -150,14 +155,18 @@ internal fun convert(
     is StrongEmphasis -> AstStrongEmphasis(
       delimiter = node.openingDelimiter
     )
-    is Text -> AstText(
-      literal = node.literal
-    )
-    is LinkReferenceDefinition -> AstLinkReferenceDefinition(
-      title = node.title ?: "",
-      destination = node.destination,
-      label = node.label
-    )
+    is Text -> {
+      AstText(
+        literal = node.literal
+      )
+    }
+    is LinkReferenceDefinition -> {
+      AstLinkReferenceDefinition(
+        title = node.title ?: "",
+        destination = node.destination,
+        label = node.label
+      )
+    }
     is TableBlock -> AstTableRoot
     is TableHead -> AstTableHeader
     is TableBody -> AstTableBody
@@ -206,7 +215,8 @@ internal actual fun parsedMarkdownAst(text: String, options: MarkdownParseOption
         listOfNotNull(
           TablesExtension.create(),
           StrikethroughExtension.create(),
-          if (options.autolink) AutolinkExtension.create() else null
+          if (options.autolink) AutolinkExtension.create() else null,
+          if (options.nostrlink) NostrUriExtension.create() else null
         )
       )
       .build()

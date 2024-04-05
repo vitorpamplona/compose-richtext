@@ -1,6 +1,7 @@
 package com.halilibo.richtext.markdown
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -11,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.buildAnnotatedString
 import com.halilibo.richtext.markdown.node.AstBlockQuote
 import com.halilibo.richtext.markdown.node.AstBulletList
 import com.halilibo.richtext.markdown.node.AstDocument
@@ -56,9 +58,11 @@ public fun RichTextScope.Markdown(
   markdownParseOptions: MarkdownParseOptions = MarkdownParseOptions.Default,
   onLinkClicked: ((String) -> Unit)? = null,
   onMediaCompose: (@Composable (String, String) -> Unit)? = null,
+  onNostrCompose: (@Composable (String) -> Unit)? = null
 ) {
   val onLinkClickedState = rememberUpdatedState(onLinkClicked)
   val onMediaComposeState = rememberUpdatedState(onMediaCompose)
+  val onNostrComposeState = rememberUpdatedState(onNostrCompose)
 
   // Can't use UriHandlerAmbient.current::openUri here,
   // see https://issuetracker.google.com/issues/172366483
@@ -77,9 +81,12 @@ public fun RichTextScope.Markdown(
     )
   }
 
+  val realNostrUriComposer = onNostrComposeState.value
+
   CompositionLocalProvider(
     LocalOnLinkClicked provides realLinkClickedHandler,
-    LocalOnAstImageCompose provides realAstImageComposer
+    LocalOnAstImageCompose provides realAstImageComposer,
+    LocalOnNostrUriCompose provides realNostrUriComposer
   ) {
     val markdownAst = parsedMarkdownAst(text = content, options = markdownParseOptions)
     RecursiveRenderMarkdownAst(astNode = markdownAst)
@@ -233,4 +240,14 @@ internal val LocalOnLinkClicked =
 internal val LocalOnAstImageCompose =
   compositionLocalOf<@Composable (String, String) -> Unit> {
     @Composable { _: String, _: String -> error("OnMediaComposer is not provided") }
+  }
+
+/**
+ * An internal ambient to pass through OnNostrCompose function from root [Markdown] composable
+ * to children that render images. Although being explicit is preferred, recursive calls to
+ * [visitChildren] increases verbosity with each extra argument.
+ */
+internal val LocalOnNostrUriCompose =
+  compositionLocalOf<(@Composable (String) -> Unit)?> {
+    @Composable { _: String -> error("OnNostrComposer is not provided") }
   }
