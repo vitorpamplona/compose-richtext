@@ -54,7 +54,7 @@ public class AutolinkNostrPostProcessor : PostProcessor {
       index = matcher.end()
 
       // removes space after the uri
-      if (literal[index] == ' ') {
+      if (index < literal.length && literal[index] == ' ') {
         index++
       }
     }
