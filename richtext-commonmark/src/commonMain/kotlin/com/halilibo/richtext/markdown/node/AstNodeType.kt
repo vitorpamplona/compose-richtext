@@ -122,7 +122,7 @@ internal data class AstStrongEmphasis(
 @Immutable
 internal data class AstLink(
   val destination: String,
-  val title: String
+  val title: String?
 ) : AstInlineNodeType()
 
 @Immutable
@@ -132,7 +132,7 @@ internal data class AstNostrUri(
 
 @Immutable
 internal data class AstImage(
-  val title: String,
+  val title: String?,
   val destination: String
 ) : AstInlineNodeType()
 

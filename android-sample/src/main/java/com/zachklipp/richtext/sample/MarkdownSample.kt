@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -30,16 +28,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.halilibo.richtext.markdown.DefaultMediaRenderer
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.markdown.MarkdownParseOptions
+import com.halilibo.richtext.markdown.UriComposableRenderer
 import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.material.MaterialRichText
 import com.halilibo.richtext.ui.resolveDefaults
@@ -55,7 +53,6 @@ import com.halilibo.richtext.ui.resolveDefaults
   var isWordWrapEnabled by remember { mutableStateOf(true) }
   var markdownParseOptions by remember { mutableStateOf(MarkdownParseOptions.Default) }
   var isAutolinkEnabled by remember { mutableStateOf(true) }
-  var isAutoNostrLinkEnabled by remember { mutableStateOf(true) }
 
   LaunchedEffect(isWordWrapEnabled) {
     richTextStyle = richTextStyle.copy(
@@ -64,13 +61,9 @@ import com.halilibo.richtext.ui.resolveDefaults
       )
     )
   }
-  LaunchedEffect(isAutolinkEnabled, isAutoNostrLinkEnabled) {
+  LaunchedEffect(isAutolinkEnabled) {
     markdownParseOptions = markdownParseOptions.copy(
       autolink = isAutolinkEnabled,
-      nostrlink = isAutoNostrLinkEnabled,
-      isImage = {
-        it.contains("image%2Fjpeg")
-      }
     )
   }
 
@@ -107,18 +100,16 @@ import com.halilibo.richtext.ui.resolveDefaults
               label = "Autolink"
             )
 
-            CheckboxPreference(
-              onClick = {
-                isAutoNostrLinkEnabled = !isAutoNostrLinkEnabled
-              },
-              checked = isAutoNostrLinkEnabled,
-              label = "Nostrlink"
-            )
-
             RichTextStyleConfig(
               richTextStyle = richTextStyle,
               onChanged = { richTextStyle = it }
             )
+          }
+        }
+
+        val renderer = remember {
+          MyMediaRenderer {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
           }
         }
 
@@ -135,11 +126,7 @@ import com.halilibo.richtext.ui.resolveDefaults
                   onLinkClicked = {
                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                   },
-                  onNostrCompose = {
-                    Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
-                      Text("Cool rendering of ${it}")
-                    }
-                  }
+                  mediaRenderer = renderer,
                 )
               }
             }
@@ -148,6 +135,18 @@ import com.halilibo.richtext.ui.resolveDefaults
       }
     }
   }
+}
+
+private class MyMediaRenderer(onClick: (String) -> Unit): DefaultMediaRenderer(onClick) {
+  override fun renderNostrUri(uri: String, helper: UriComposableRenderer) {
+    helper.renderInline {
+      Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
+        Text("Cool rendering of ${uri}")
+      }
+    }
+  }
+
+  override fun shouldRenderLinkPreview(uri: String): Boolean { return uri.contains("image%2Fjpeg") }
 }
 
 @Composable
@@ -188,6 +187,8 @@ private val sampleMarkdown = """
   https://image.nostr.build/40ae418ccc5336e17b5949bacc11c31835603437816f8bf867c171f07d34dd54.jpg#m=image%2Fjpeg&dim=720x1612&blurhash=%5BLFFgJMyj%5Bt74TMyoft70LxufiV%5B_Nt7f6WB4TogoMj%5Bxut7ofWAS%7EofbFjtD%25xtWBWBs%2BM%7BjbbH&x=c3a3f49c017f58749226f8ae6021c11a745d2354f52a229cb99eef4a9d20ec39
   
   Here is my nostr nostr:nevent1qqsw9ra6kyw8a58rs4h5fqrars2ga87zaaxpm3vtl5qdj473d9d23wgpz3mhxue69uhhyetvv9ujuerpd46hxtnfdupzpef89h53f0fsza2ugwdc3e54nfpun5nxfqclpy79r6w8nxsk5yp0qvzqqqqqqyvd5c8m uri
+  
+  Here is a user: nostr:nprofile1qyw8wumn8ghj7un9d3shjtnzd96xxmmfdecxzunt9e3k7mf0qythwumn8ghj7un9d3shjtnswf5k6ctv9ehx2ap0qyvhwumn8ghj7un9d3shjtnndehhyapwwdhkx6tpdshsqgqyey2a4mlw8qchlfe5g39vacus4qnflevppv3yre0xm56rm7lveyq3g8ve
   
   ## Full-bleed Image
   ![](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1920px-Image_created_with_a_mobile_phone.png)

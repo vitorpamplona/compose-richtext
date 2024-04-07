@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
@@ -30,17 +29,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.singleWindowApplication
+import com.halilibo.richtext.markdown.DefaultMediaRenderer
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.markdown.MarkdownParseOptions
+import com.halilibo.richtext.markdown.UriComposableRenderer
 import com.halilibo.richtext.ui.CodeBlockStyle
-import com.halilibo.richtext.ui.RichText
 import com.halilibo.richtext.ui.RichTextStyle
-import com.halilibo.richtext.ui.Table
 import com.halilibo.richtext.ui.material.MaterialRichText
 import com.halilibo.richtext.ui.resolveDefaults
 
@@ -53,6 +51,10 @@ fun main(): Unit = singleWindowApplication(
         codeBlockStyle = CodeBlockStyle(wordWrap = true)
       ).resolveDefaults()
     )
+  }
+
+  val renderer = remember {
+    MyMediaRenderer {}
   }
 
   Surface {
@@ -91,18 +93,8 @@ fun main(): Unit = singleWindowApplication(
             ) {
               Markdown(
                 content = text,
-                markdownParseOptions = MarkdownParseOptions(
-                  true,
-                  true,
-                  isImage = {
-                    it.contains("image%2Fjpeg")
-                  }
-                ),
-                onNostrCompose = {
-                  Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
-                    Text("Cool rendering of ${it}")
-                  }
-                }
+                markdownParseOptions = MarkdownParseOptions(true),
+                mediaRenderer = renderer
               )
             }
           }
@@ -110,6 +102,18 @@ fun main(): Unit = singleWindowApplication(
       }
     }
   }
+}
+
+private class MyMediaRenderer(onClick: (String) -> Unit): DefaultMediaRenderer(onClick) {
+  override fun renderNostrUri(uri: String, helper: UriComposableRenderer) {
+    helper.renderInline {
+      Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
+        Text("Cool rendering of ${uri}")
+      }
+    }
+  }
+
+  override fun shouldRenderLinkPreview(uri: String): Boolean { return uri.contains("image%2Fjpeg") }
 }
 
 @Composable

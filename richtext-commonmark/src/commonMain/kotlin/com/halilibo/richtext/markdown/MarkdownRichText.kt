@@ -1,10 +1,8 @@
 package com.halilibo.richtext.markdown
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.halilibo.richtext.markdown.node.AstBlockQuote
@@ -32,7 +30,6 @@ import com.halilibo.richtext.ui.string.InlineContent
 import com.halilibo.richtext.ui.string.RichTextString
 import com.halilibo.richtext.ui.string.Text
 import com.halilibo.richtext.ui.string.withFormat
-import java.util.regex.Pattern
 
 /**
  * Only render the text content that exists below [astNode]. All the content blocks
@@ -63,12 +60,11 @@ internal fun RichTextScope.MarkdownRichText(
   modifier: Modifier = Modifier
 ) {
   val onLinkClicked = LocalOnLinkClicked.current
-  val onMediaCompose = LocalOnAstImageCompose.current
-  val onNostrUriCompose = LocalOnNostrUriCompose.current
+  val onUriCompose = LocalOnUriCompose.current
 
   // Assume that only RichText nodes reside below this level.
-  val richText = remember(astNode, onMediaCompose, onNostrUriCompose, onLinkClicked) {
-    computeRichTextString(astNode, onMediaCompose, onNostrUriCompose, onLinkClicked)
+  val richText = remember(astNode, onUriCompose, onLinkClicked) {
+    computeRichTextString(astNode, onUriCompose, onLinkClicked)
   }
 
   Text(text = richText, modifier = modifier)
@@ -76,11 +72,11 @@ internal fun RichTextScope.MarkdownRichText(
 
 private fun computeRichTextString(
   astNode: AstNode,
-  onRenderImage: @Composable (String, String) -> Unit,
-  onNostrUriCompose: (@Composable (String) -> Unit)?,
+  renderer: MediaRenderer,
   onLinkClicked: (String) -> Unit,
 ): RichTextString {
   val richTextStringBuilder = RichTextString.Builder()
+  val helper = UriComposableRenderer(richTextStringBuilder)
 
   // Modified pre-order traversal with pushFormat, popFormat support.
   var iteratorStack = listOf(
@@ -91,9 +87,13 @@ private fun computeRichTextString(
     )
   )
 
+  var skipChildren: Boolean
+
   while (iteratorStack.isNotEmpty()) {
     val (currentNode, isVisited, formatIndex) = iteratorStack.first().copy()
     iteratorStack = iteratorStack.drop(1)
+
+    skipChildren = false
 
     if (!isVisited) {
       val newFormatIndex = when (val currentNodeType = currentNode.type) {
@@ -108,41 +108,24 @@ private fun computeRichTextString(
           RichTextString.Format.Strikethrough
         )
         is AstImage -> {
-          richTextStringBuilder.appendInlineContent(
-            content = InlineContent(
-              initialSize = {
-                IntSize(128.dp.roundToPx(), 128.dp.roundToPx())
-              }
-            ) {
-              onRenderImage(currentNodeType.title, currentNodeType.destination)
-            }
-          )
+          renderer.renderImage(currentNodeType.title, currentNodeType.destination, helper)
           null
         }
         is AstNostrUri -> {
-          if (onNostrUriCompose != null) {
-            richTextStringBuilder.appendInlineContent(
-              content = InlineContent(
-                initialSize = {
-                  IntSize(128.dp.roundToPx(), 128.dp.roundToPx())
-                }
-              ) {
-                onNostrUriCompose(currentNodeType.destination)
-              }
-            )
+          renderer.renderNostrUri(currentNodeType.destination, helper)
+          null
+        }
+        is AstLink -> {
+          if (renderer.shouldRenderLinkPreview(currentNodeType.destination)) {
+            skipChildren = true
+            renderer.renderLinkPreview(currentNodeType.title, currentNodeType.destination, helper)
             null
           } else {
             richTextStringBuilder.pushFormat(RichTextString.Format.Link(
               onClick = { onLinkClicked(currentNodeType.destination) }
             ))
-            richTextStringBuilder.append(currentNodeType.destination)
-            richTextStringBuilder.pop()
-            null
           }
         }
-        is AstLink -> richTextStringBuilder.pushFormat(RichTextString.Format.Link(
-          onClick = { onLinkClicked(currentNodeType.destination) }
-        ))
         is AstSoftLineBreak -> {
           richTextStringBuilder.append(" ")
           null
@@ -172,7 +155,7 @@ private fun computeRichTextString(
       )
 
       // Do not visit children of terminals such as Text, Image, etc.
-      if (!currentNode.isRichTextTerminal()) {
+      if (!skipChildren && !currentNode.isRichTextTerminal()) {
         currentNode.childrenSequence(reverse = true).forEach {
           iteratorStack = iteratorStack.addFirst(
             AstNodeTraversalEntry(
@@ -201,4 +184,31 @@ private data class AstNodeTraversalEntry(
 
 private inline fun <reified T> List<T>.addFirst(item: T): List<T> {
   return listOf(item) + this
+}
+
+public class UriComposableRenderer(
+  private val richTextStringBuilder: RichTextString.Builder
+) {
+  public fun renderInline(innerComposable: @Composable () -> Unit) {
+    richTextStringBuilder.appendInlineContent(
+      content = InlineContent(
+        initialSize = {
+          IntSize(128.dp.roundToPx(), 128.dp.roundToPx())
+        }
+      ) {
+        innerComposable()
+      }
+    )
+  }
+  public fun renderAsCompleteLink(title: String, onClick: () -> Unit) {
+    richTextStringBuilder.pushFormat(RichTextString.Format.Link(
+      onClick = onClick
+    ))
+    richTextStringBuilder.append(title)
+    richTextStringBuilder.pop()
+  }
+
+  public fun openLink(onClick: () -> Unit): Int = richTextStringBuilder.pushFormat(RichTextString.Format.Link(
+    onClick = onClick
+  ))
 }

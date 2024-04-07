@@ -80,7 +80,6 @@ import org.commonmark.parser.Parser
  */
 internal fun convert(
   node: Node?,
-  isImage: (link: String) -> Boolean,
   parentNode: AstNode? = null,
   previousNode: AstNode? = null,
 ): AstNode? {
@@ -121,7 +120,7 @@ internal fun convert(
       }
       else {
         AstImage(
-          title = node.title ?: "",
+          title = node.title,
           destination = node.destination
         )
       }
@@ -130,21 +129,16 @@ internal fun convert(
       literal = node.literal
     )
     is Link -> {
-      if (isImage(node.destination)) {
-        AstImage(
-          title = node.title ?: "",
-          destination = node.destination
-        )
-      } else {
-        AstLink(
-          title = node.title ?: "",
-          destination = node.destination
-        )
-      }
+      AstLink(
+        title = node.title,
+        destination = node.destination
+      )
     }
-    is NostrUri -> AstNostrUri(
-      destination = node.destination
-    )
+    is NostrUri -> {
+      AstNostrUri(
+        destination = node.destination
+      )
+    }
     is ListItem -> AstListItem
     is OrderedList -> AstOrderedList(
       startNumber = node.startNumber,
@@ -194,8 +188,8 @@ internal fun convert(
   }
 
   if (newNode != null) {
-    newNode.links.firstChild = convert(node.firstChild, isImage, parentNode = newNode, previousNode = null)
-    newNode.links.next = convert(node.next, isImage, parentNode = parentNode, previousNode = newNode)
+    newNode.links.firstChild = convert(node.firstChild, parentNode = newNode, previousNode = null)
+    newNode.links.next = convert(node.next, parentNode = parentNode, previousNode = newNode)
   }
 
   if (node.next == null) {
@@ -205,7 +199,7 @@ internal fun convert(
   return newNode
 }
 
-internal fun Node.convert(isImage: (link: String) -> Boolean) = convert(this, isImage)
+internal fun Node.convert() = convert(this)
 
 @Composable
 internal actual fun parsedMarkdownAst(text: String, options: MarkdownParseOptions): AstNode? {
@@ -216,14 +210,14 @@ internal actual fun parsedMarkdownAst(text: String, options: MarkdownParseOption
           TablesExtension.create(),
           StrikethroughExtension.create(),
           if (options.autolink) AutolinkExtension.create() else null,
-          if (options.nostrlink) NostrUriExtension.create() else null
+          if (options.autolink) NostrUriExtension.create() else null
         )
       )
       .build()
   }
 
   val astRootNode by produceState<AstNode?>(null, text, parser) {
-    value = parser.parse(text).convert(options.isImage)
+    value = parser.parse(text).convert()
   }
 
   return astRootNode

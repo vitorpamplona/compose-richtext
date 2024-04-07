@@ -1,7 +1,6 @@
 package com.halilibo.richtext.markdown
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -12,7 +11,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.buildAnnotatedString
 import com.halilibo.richtext.markdown.node.AstBlockQuote
 import com.halilibo.richtext.markdown.node.AstBulletList
 import com.halilibo.richtext.markdown.node.AstDocument
@@ -56,13 +54,10 @@ import com.halilibo.richtext.ui.string.richTextString
 public fun RichTextScope.Markdown(
   content: String,
   markdownParseOptions: MarkdownParseOptions = MarkdownParseOptions.Default,
+  mediaRenderer: MediaRenderer? = null,
   onLinkClicked: ((String) -> Unit)? = null,
-  onMediaCompose: (@Composable (String, String) -> Unit)? = null,
-  onNostrCompose: (@Composable (String) -> Unit)? = null
 ) {
   val onLinkClickedState = rememberUpdatedState(onLinkClicked)
-  val onMediaComposeState = rememberUpdatedState(onMediaCompose)
-  val onNostrComposeState = rememberUpdatedState(onNostrCompose)
 
   // Can't use UriHandlerAmbient.current::openUri here,
   // see https://issuetracker.google.com/issues/172366483
@@ -72,21 +67,11 @@ public fun RichTextScope.Markdown(
     }
   }
 
-  val realAstImageComposer = onMediaComposeState.value ?: { title, destination ->
-    RemoteImage(
-      url = destination,
-      contentDescription = title,
-      modifier = Modifier.fillMaxWidth(),
-      contentScale = ContentScale.Inside
-    )
-  }
-
-  val realNostrUriComposer = onNostrComposeState.value
+  val onUriComposeState = rememberUpdatedState(mediaRenderer ?: DefaultMediaRenderer(realLinkClickedHandler))
 
   CompositionLocalProvider(
     LocalOnLinkClicked provides realLinkClickedHandler,
-    LocalOnAstImageCompose provides realAstImageComposer,
-    LocalOnNostrUriCompose provides realNostrUriComposer
+    LocalOnUriCompose provides onUriComposeState.value,
   ) {
     val markdownAst = parsedMarkdownAst(text = content, options = markdownParseOptions)
     RecursiveRenderMarkdownAst(astNode = markdownAst)
@@ -233,21 +218,49 @@ internal val LocalOnLinkClicked =
   compositionLocalOf<(String) -> Unit> { error("OnLinkClicked is not provided") }
 
 /**
- * An internal ambient to pass through OnImageCompose function from root [Markdown] composable
- * to children that render images. Although being explicit is preferred, recursive calls to
- * [visitChildren] increases verbosity with each extra argument.
- */
-internal val LocalOnAstImageCompose =
-  compositionLocalOf<@Composable (String, String) -> Unit> {
-    @Composable { _: String, _: String -> error("OnMediaComposer is not provided") }
-  }
-
-/**
  * An internal ambient to pass through OnNostrCompose function from root [Markdown] composable
  * to children that render images. Although being explicit is preferred, recursive calls to
  * [visitChildren] increases verbosity with each extra argument.
  */
-internal val LocalOnNostrUriCompose =
-  compositionLocalOf<(@Composable (String) -> Unit)?> {
-    @Composable { _: String -> error("OnNostrComposer is not provided") }
+internal val LocalOnUriCompose = compositionLocalOf<MediaRenderer> { DefaultMediaRenderer() {
+  error("OnLinkClicked is not provided")
+} }
+
+public interface MediaRenderer {
+  public fun renderImage(title: String?, uri: String, helper: UriComposableRenderer)
+  public fun renderNostrUri(uri: String, helper: UriComposableRenderer)
+  public fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer)
+  public fun shouldRenderLinkPreview(uri: String): Boolean
+}
+
+public open class DefaultMediaRenderer(public val onLinkClicked: (String) -> Unit): MediaRenderer {
+  override fun renderImage(title: String?, uri: String, helper: UriComposableRenderer) {
+    helper.renderInline {
+      RemoteImage(
+        url = uri,
+        contentDescription = title,
+        modifier = Modifier.fillMaxWidth(),
+        contentScale = ContentScale.Inside
+      )
+    }
   }
+
+  override fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer) {
+    helper.renderInline {
+      RemoteImage(
+        url = uri,
+        contentDescription = title,
+        modifier = Modifier.fillMaxWidth(),
+        contentScale = ContentScale.Inside
+      )
+    }
+  }
+
+  override fun renderNostrUri(uri: String, helper: UriComposableRenderer) {
+    helper.renderAsCompleteLink(uri) {
+      onLinkClicked(uri)
+    }
+  }
+
+  override fun shouldRenderLinkPreview(uri: String): Boolean { return false }
+}
