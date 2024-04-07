@@ -10,6 +10,7 @@ import com.halilibo.richtext.markdown.node.AstCode
 import com.halilibo.richtext.markdown.node.AstEmphasis
 import com.halilibo.richtext.markdown.node.AstFencedCodeBlock
 import com.halilibo.richtext.markdown.node.AstHardLineBreak
+import com.halilibo.richtext.markdown.node.AstHashtag
 import com.halilibo.richtext.markdown.node.AstHeading
 import com.halilibo.richtext.markdown.node.AstImage
 import com.halilibo.richtext.markdown.node.AstIndentedCodeBlock
@@ -113,6 +114,10 @@ private fun computeRichTextString(
         }
         is AstNostrUri -> {
           renderer.renderNostrUri(currentNodeType.destination, helper)
+          null
+        }
+        is AstHashtag -> {
+          renderer.renderHashtag(currentNodeType.tag, helper)
           null
         }
         is AstLink -> {

@@ -11,6 +11,7 @@ import com.halilibo.richtext.markdown.node.AstDocument
 import com.halilibo.richtext.markdown.node.AstEmphasis
 import com.halilibo.richtext.markdown.node.AstFencedCodeBlock
 import com.halilibo.richtext.markdown.node.AstHardLineBreak
+import com.halilibo.richtext.markdown.node.AstHashtag
 import com.halilibo.richtext.markdown.node.AstHeading
 import com.halilibo.richtext.markdown.node.AstHtmlBlock
 import com.halilibo.richtext.markdown.node.AstHtmlInline
@@ -57,6 +58,7 @@ import org.commonmark.node.Document
 import org.commonmark.node.Emphasis
 import org.commonmark.node.FencedCodeBlock
 import org.commonmark.node.HardLineBreak
+import org.commonmark.node.Hashtag
 import org.commonmark.node.Heading
 import org.commonmark.node.HtmlBlock
 import org.commonmark.node.HtmlInline
@@ -132,6 +134,11 @@ internal fun convert(
       AstLink(
         title = node.title,
         destination = node.destination
+      )
+    }
+    is Hashtag -> {
+      AstHashtag(
+        tag = node.tag
       )
     }
     is NostrUri -> {
@@ -210,7 +217,8 @@ internal actual fun parsedMarkdownAst(text: String, options: MarkdownParseOption
           TablesExtension.create(),
           StrikethroughExtension.create(),
           if (options.autolink) AutolinkExtension.create() else null,
-          if (options.autolink) NostrUriExtension.create() else null
+          if (options.autolink) NostrUriExtension.create() else null,
+          if (options.autolink) HashtagExtension.create() else null
         )
       )
       .build()

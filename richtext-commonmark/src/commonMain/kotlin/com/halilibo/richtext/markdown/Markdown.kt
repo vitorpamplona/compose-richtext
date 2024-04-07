@@ -229,6 +229,7 @@ internal val LocalOnUriCompose = compositionLocalOf<MediaRenderer> { DefaultMedi
 public interface MediaRenderer {
   public fun renderImage(title: String?, uri: String, helper: UriComposableRenderer)
   public fun renderNostrUri(uri: String, helper: UriComposableRenderer)
+  public fun renderHashtag(uri: String, helper: UriComposableRenderer)
   public fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer)
   public fun shouldRenderLinkPreview(uri: String): Boolean
 }
@@ -254,6 +255,12 @@ public open class DefaultMediaRenderer(public val onLinkClicked: (String) -> Uni
   override fun renderNostrUri(uri: String, helper: UriComposableRenderer) {
     helper.renderAsCompleteLink(uri) {
       onLinkClicked(uri)
+    }
+  }
+
+  override fun renderHashtag(tag: String, helper: UriComposableRenderer) {
+    helper.renderAsCompleteLink(tag) {
+      onLinkClicked("hashtag:${tag}")
     }
   }
 

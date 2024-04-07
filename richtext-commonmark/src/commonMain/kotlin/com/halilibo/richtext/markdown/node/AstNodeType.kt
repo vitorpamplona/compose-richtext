@@ -131,6 +131,11 @@ internal data class AstNostrUri(
 ) : AstInlineNodeType()
 
 @Immutable
+internal data class AstHashtag(
+  val tag: String
+) : AstInlineNodeType()
+
+@Immutable
 internal data class AstImage(
   val title: String?,
   val destination: String

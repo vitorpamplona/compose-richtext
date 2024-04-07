@@ -214,7 +214,9 @@ private val sampleMarkdown = """
 
   ## Emphasis
 
-  Here's a #hashtag
+  Here's a #hashtag and some space
+  
+  #Amethyst #Nostr, #coffestr #hey
 
   Emphasis, aka italics, with *asterisks* or _underscores_.
 

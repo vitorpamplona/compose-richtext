@@ -3,6 +3,7 @@ package com.halilibo.richtext.markdown
 import org.commonmark.Extension
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomNode
+import org.commonmark.node.Hashtag
 import org.commonmark.node.Link
 import org.commonmark.node.Node
 import org.commonmark.node.NostrUri
@@ -15,19 +16,19 @@ import java.util.regex.Pattern
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-public class NostrUriExtension private constructor() : ParserExtension {
+public class HashtagExtension private constructor() : ParserExtension {
   override fun extend(parserBuilder: Builder) {
-    parserBuilder.postProcessor(AutolinkNostrPostProcessor())
+    parserBuilder.postProcessor(AutolinkHashtagPostProcessor())
   }
 
   public companion object {
     public fun create(): Extension {
-      return NostrUriExtension()
+      return HashtagExtension()
     }
   }
 }
 
-public class AutolinkNostrPostProcessor : PostProcessor {
+public class AutolinkHashtagPostProcessor : PostProcessor {
   override fun process(node: Node): Node {
     val autolinkVisitor = AutolinkVisitor()
     node.accept(autolinkVisitor)
@@ -35,13 +36,13 @@ public class AutolinkNostrPostProcessor : PostProcessor {
   }
 
   private fun linkify(originalTextNode: Text) {
-    if (!originalTextNode.literal.contains(':')) return
+    if (!originalTextNode.literal.contains('#')) return
 
     val sourceSpans = originalTextNode.sourceSpans
     val sourceSpan = if (sourceSpans.size == 1) sourceSpans[0] else null
     val literal = originalTextNode.literal
 
-    val matcher = nip19regex.matcher(originalTextNode.literal)
+    val matcher = hashTagsPattern.matcher(originalTextNode.literal)
 
     var lastNode: Node = originalTextNode
 
@@ -52,15 +53,10 @@ public class AutolinkNostrPostProcessor : PostProcessor {
         lastNode = insertNode(textNode, lastNode)
       }
 
-      val linkNode = createNostrUri(literal, matcher.start(), matcher.end(), sourceSpan)
+      val linkNode = createHashtag(literal, matcher.start(), matcher.end(), sourceSpan)
       lastNode = insertNode(linkNode, lastNode)
 
       index = matcher.end()
-
-      // removes space after the uri
-      if (index < literal.length && literal[index] == ' ') {
-        index++
-      }
     }
 
     if (index != 0) {
@@ -96,11 +92,8 @@ public class AutolinkNostrPostProcessor : PostProcessor {
   }
 
   public companion object {
-    public val nip19regex: Pattern =
-      Pattern.compile(
-        "nostr:(nsec|npub|nevent|naddr|note|nprofile|nrelay|nembed)1([qpzry9x8gf2tvdw0s3jn54khce6mua7l]+)",
-        Pattern.CASE_INSENSITIVE,
-      )
+    public val hashTagsPattern: Pattern =
+      Pattern.compile("#[^\\s!@#\$%^&*()=+./,\\[{\\]};:'\"?><]+", Pattern.CASE_INSENSITIVE)
 
     private fun createTextNode(literal: String, beginIndex: Int, endIndex: Int, sourceSpan: SourceSpan?): Text {
       val text = literal.substring(beginIndex, endIndex)
@@ -112,9 +105,9 @@ public class AutolinkNostrPostProcessor : PostProcessor {
       return textNode
     }
 
-    private fun createNostrUri(literal: String, beginIndex: Int, endIndex: Int, sourceSpan: SourceSpan?): NostrUri {
+    private fun createHashtag(literal: String, beginIndex: Int, endIndex: Int, sourceSpan: SourceSpan?): Hashtag {
       val text = literal.substring(beginIndex, endIndex)
-      val textNode = NostrUri(text)
+      val textNode = Hashtag(text)
       if (sourceSpan != null) {
         val length = endIndex - beginIndex
         textNode.addSourceSpan(SourceSpan.of(sourceSpan.lineIndex, beginIndex, length))
