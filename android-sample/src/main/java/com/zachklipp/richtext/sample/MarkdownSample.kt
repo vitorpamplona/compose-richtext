@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.em
 import com.halilibo.richtext.markdown.DefaultMediaRenderer
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.markdown.MarkdownParseOptions
+import com.halilibo.richtext.markdown.RemoteImage
 import com.halilibo.richtext.markdown.UriComposableRenderer
 import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.material.MaterialRichText
@@ -146,6 +148,17 @@ private class MyMediaRenderer(onClick: (String) -> Unit): DefaultMediaRenderer(o
     }
   }
 
+  override fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer) {
+    helper.renderInline {
+      RemoteImage(
+        url = uri,
+        contentDescription = title,
+        modifier = Modifier.fillMaxWidth(),
+        contentScale = ContentScale.Inside
+      )
+    }
+  }
+
   override fun shouldRenderLinkPreview(uri: String): Boolean { return uri.contains("image%2Fjpeg") }
 }
 
@@ -200,6 +213,8 @@ private val sampleMarkdown = """
   ![](https://cdn.nostr.build/p/PxZ0.jpg)
 
   ## Emphasis
+
+  Here's a #hashtag
 
   Emphasis, aka italics, with *asterisks* or _underscores_.
 

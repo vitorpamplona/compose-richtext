@@ -20,7 +20,7 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 @Composable
-internal actual fun RemoteImage(
+public actual fun RemoteImage(
   url: String,
   contentDescription: String?,
   modifier: Modifier,

@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -36,6 +37,7 @@ import androidx.compose.ui.window.singleWindowApplication
 import com.halilibo.richtext.markdown.DefaultMediaRenderer
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.markdown.MarkdownParseOptions
+import com.halilibo.richtext.markdown.RemoteImage
 import com.halilibo.richtext.markdown.UriComposableRenderer
 import com.halilibo.richtext.ui.CodeBlockStyle
 import com.halilibo.richtext.ui.RichTextStyle
@@ -110,6 +112,17 @@ private class MyMediaRenderer(onClick: (String) -> Unit): DefaultMediaRenderer(o
       Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
         Text("Cool rendering of ${uri}")
       }
+    }
+  }
+
+  override fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer) {
+    helper.renderInline {
+      RemoteImage(
+        url = uri,
+        contentDescription = title,
+        modifier = Modifier.fillMaxWidth(),
+        contentScale = ContentScale.Inside
+      )
     }
   }
 

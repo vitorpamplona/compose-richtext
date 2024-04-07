@@ -24,7 +24,7 @@ private val DEFAULT_IMAGE_SIZE = 64.dp
  * Implementation of RemoteImage by using Coil library for Android.
  */
 @Composable
-internal actual fun RemoteImage(
+actual fun RemoteImage(
   url: String,
   contentDescription: String?,
   modifier: Modifier,

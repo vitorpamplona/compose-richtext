@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
  * way to show images but it doesn't exist in desktop.
  */
 @Composable
-internal expect fun RemoteImage(
+public expect fun RemoteImage(
   url: String,
   contentDescription: String?,
   modifier: Modifier = Modifier,

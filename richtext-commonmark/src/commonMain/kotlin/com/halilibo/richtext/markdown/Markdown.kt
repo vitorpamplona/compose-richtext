@@ -246,13 +246,8 @@ public open class DefaultMediaRenderer(public val onLinkClicked: (String) -> Uni
   }
 
   override fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer) {
-    helper.renderInline {
-      RemoteImage(
-        url = uri,
-        contentDescription = title,
-        modifier = Modifier.fillMaxWidth(),
-        contentScale = ContentScale.Inside
-      )
+    helper.renderAsCompleteLink(uri) {
+      onLinkClicked(uri)
     }
   }
 
