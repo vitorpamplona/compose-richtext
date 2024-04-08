@@ -15,7 +15,7 @@ kotlin {
   android {
     publishLibraryVariants("release")
     compilations.all {
-      kotlinOptions.jvmTarget = "11"
+      kotlinOptions.jvmTarget = "17"
     }
   }
   explicitApi()
@@ -26,8 +26,8 @@ android {
   sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
 
   defaultConfig {

@@ -71,7 +71,7 @@ subprojects {
         reportUndocumented.set(true)
         skipEmptyPackages.set(true)
         skipDeprecated.set(true)
-        jdkVersion.set(11)
+        jdkVersion.set(17)
 
         // Add Android SDK packages
         noAndroidSdkLink.set(false)
