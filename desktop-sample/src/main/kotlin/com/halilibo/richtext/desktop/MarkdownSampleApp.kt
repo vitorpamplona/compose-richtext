@@ -168,7 +168,7 @@ private class MyMediaRenderer: BasicMediaRenderer() {
     }
   }
 
-  override fun shouldRenderLinkPreview(uri: String): Boolean {
+  override fun shouldRenderLinkPreview(title: String?, uri: String): Boolean {
     return uri.contains("image%2Fjpeg")
   }
 }

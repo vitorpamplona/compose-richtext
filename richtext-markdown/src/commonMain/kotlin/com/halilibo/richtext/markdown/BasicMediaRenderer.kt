@@ -38,7 +38,7 @@ public open class BasicMediaRenderer: MediaRenderer {
     renderAsCompleteLink(tag, "hashtag:${tag}", richTextStringBuilder)
   }
 
-  override fun shouldRenderLinkPreview(uri: String): Boolean { return false }
+  override fun shouldRenderLinkPreview(title: String?, uri: String): Boolean { return false }
 
   public fun renderInline(richTextStringBuilder: RichTextString.Builder, innerComposable: @Composable () -> Unit) {
     richTextStringBuilder.appendInlineContent(

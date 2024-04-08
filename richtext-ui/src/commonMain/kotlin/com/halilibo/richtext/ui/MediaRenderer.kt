@@ -11,5 +11,5 @@ public interface MediaRenderer {
   public fun renderNostrUri(uri: String, richTextStringBuilder: RichTextString.Builder)
   public fun renderHashtag(tag: String, richTextStringBuilder: RichTextString.Builder)
   public fun renderLinkPreview(title: String?, uri: String, richTextStringBuilder: RichTextString.Builder)
-  public fun shouldRenderLinkPreview(uri: String): Boolean
+  public fun shouldRenderLinkPreview(title: String?, uri: String): Boolean
 }
