@@ -13,7 +13,7 @@ repositories {
 kotlin {
   jvm()
   android {
-    publishLibraryVariants("release", "debug")
+    publishLibraryVariants("release")
     compilations.all {
       kotlinOptions.jvmTarget = "11"
     }
@@ -22,7 +22,7 @@ kotlin {
 }
 
 android {
-  compileSdk = 33
+  compileSdk = 34
   sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
   compileOptions {

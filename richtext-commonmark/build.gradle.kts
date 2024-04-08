@@ -9,7 +9,7 @@ repositories {
 }
 
 android {
-  namespace = "com.halilibo.richtext.markdown"
+  namespace = "com.halilibo.richtext.commonmark"
 }
 
 kotlin {
@@ -17,8 +17,14 @@ kotlin {
     val commonMain by getting {
       dependencies {
         implementation(compose.runtime)
-        implementation(compose.foundation)
+
+        implementation(Commonmark.core)
+        implementation(Commonmark.tables)
+        implementation(Commonmark.strikethrough)
+        implementation(Commonmark.autolink)
+
         api(project(":richtext-ui"))
+        api(project(":richtext-markdown"))
       }
     }
     val commonTest by getting
@@ -26,25 +32,13 @@ kotlin {
     val androidMain by getting {
       kotlin.srcDir("src/commonJvmAndroid/kotlin")
       dependencies {
-        implementation(Compose.coil)
-
-        implementation(Commonmark.core)
-        implementation(Commonmark.tables)
-        implementation(Commonmark.strikethrough)
-        implementation(Commonmark.autolink)
       }
     }
 
     val jvmMain by getting {
       kotlin.srcDir("src/commonJvmAndroid/kotlin")
       dependencies {
-        implementation(compose.desktop.currentOs)
-        implementation(Network.okHttp)
 
-        implementation(Commonmark.core)
-        implementation(Commonmark.tables)
-        implementation(Commonmark.strikethrough)
-        implementation(Commonmark.autolink)
       }
     }
 

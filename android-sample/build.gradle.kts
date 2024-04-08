@@ -1,6 +1,7 @@
 plugins {
   id("com.android.application")
   kotlin("android")
+  id("org.jetbrains.compose") version Compose.desktopVersion
 }
 
 android {
@@ -32,12 +33,12 @@ android {
 dependencies {
   implementation(project(":printing"))
   implementation(project(":richtext-commonmark"))
-  implementation(project(":richtext-ui-material"))
+  implementation(project(":richtext-ui-material3"))
   implementation(project(":slideshow"))
   implementation(AndroidX.appcompat)
   implementation(Compose.activity)
-  implementation(Compose.foundation)
-  implementation(Compose.icons)
-  implementation(Compose.material)
-  implementation(Compose.tooling)
+  implementation(compose.foundation)
+  implementation(compose.materialIconsExtended)
+  implementation(compose.material3)
+  implementation(compose.uiTooling)
 }

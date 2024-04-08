@@ -6,21 +6,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,30 +33,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import com.halilibo.richtext.markdown.DefaultMediaRenderer
-import com.halilibo.richtext.markdown.Markdown
-import com.halilibo.richtext.markdown.MarkdownParseOptions
 import com.halilibo.richtext.markdown.RemoteImage
-import com.halilibo.richtext.markdown.UriComposableRenderer
+import com.halilibo.richtext.commonmark.CommonmarkAstNodeParser
+import com.halilibo.richtext.commonmark.MarkdownParseOptions
+import com.halilibo.richtext.markdown.BasicMarkdown
+import com.halilibo.richtext.markdown.BasicMediaRenderer
 import com.halilibo.richtext.ui.RichTextStyle
-import com.halilibo.richtext.ui.material.MaterialRichText
+import com.halilibo.richtext.ui.material3.RichText
 import com.halilibo.richtext.ui.resolveDefaults
+import com.halilibo.richtext.ui.string.UriComposableRenderer
 
 @Preview
 @Composable private fun MarkdownSamplePreview() {
   MarkdownSample()
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable fun MarkdownSample() {
   var richTextStyle by remember { mutableStateOf(RichTextStyle().resolveDefaults()) }
   var isDarkModeEnabled by remember { mutableStateOf(false) }
   var isWordWrapEnabled by remember { mutableStateOf(true) }
   var markdownParseOptions by remember { mutableStateOf(MarkdownParseOptions.Default) }
   var isAutolinkEnabled by remember { mutableStateOf(true) }
+  var isRtl by remember { mutableStateOf(false) }
 
   LaunchedEffect(isWordWrapEnabled) {
     richTextStyle = richTextStyle.copy(
@@ -69,67 +74,79 @@ import com.halilibo.richtext.ui.resolveDefaults
     )
   }
 
-  val colors = if (isDarkModeEnabled) darkColors() else lightColors()
+  val colors = if (isDarkModeEnabled) darkColorScheme() else lightColorScheme()
   val context = LocalContext.current
 
-  MaterialTheme(colors = colors) {
-    Surface {
-      Column {
-        // Config
-        Card(elevation = 4.dp) {
-          Column {
-            CheckboxPreference(
-              onClick = {
-                isDarkModeEnabled = !isDarkModeEnabled
-              },
-              checked = isDarkModeEnabled,
-              label = "Dark Mode"
-            )
+  CompositionLocalProvider(
+    LocalLayoutDirection provides if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+  ) {
+    SampleTheme(colorScheme = colors) {
+      Surface {
+        Column {
+          // Config
+          Card(elevation = CardDefaults.elevatedCardElevation()) {
+            Column {
+              FlowRow {
+                CheckboxPreference(
+                  onClick = {
+                    isDarkModeEnabled = !isDarkModeEnabled
+                  },
+                  checked = isDarkModeEnabled,
+                  label = "Dark Mode"
+                )
+                CheckboxPreference(
+                  onClick = {
+                    isWordWrapEnabled = !isWordWrapEnabled
+                  },
+                  checked = isWordWrapEnabled,
+                  label = "Word Wrap"
+                )
+                CheckboxPreference(
+                  onClick = {
+                    isAutolinkEnabled = !isAutolinkEnabled
+                  },
+                  checked = isAutolinkEnabled,
+                  label = "Autolink"
+                )
+                CheckboxPreference(
+                  onClick = {
+                    isRtl = !isRtl
+                  },
+                  checked = isRtl,
+                  label = "RTL Layout"
+                )
+              }
 
-            CheckboxPreference(
-              onClick = {
-                isWordWrapEnabled = !isWordWrapEnabled
-              },
-              checked = isWordWrapEnabled,
-              label = "Word Wrap"
-            )
-
-            CheckboxPreference(
-              onClick = {
-                isAutolinkEnabled = !isAutolinkEnabled
-              },
-              checked = isAutolinkEnabled,
-              label = "Autolink"
-            )
-
-            RichTextStyleConfig(
-              richTextStyle = richTextStyle,
-              onChanged = { richTextStyle = it }
-            )
+              RichTextStyleConfig(
+                richTextStyle = richTextStyle,
+                onChanged = { richTextStyle = it }
+              )
+            }
           }
-        }
 
-        val renderer = remember {
-          MyMediaRenderer {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-          }
-        }
+          SelectionContainer {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+              val parser = remember(markdownParseOptions) {
+                CommonmarkAstNodeParser(markdownParseOptions)
+              }
 
-        SelectionContainer {
-          Column(Modifier.verticalScroll(rememberScrollState())) {
-            ProvideTextStyle(TextStyle(lineHeight = 1.3.em)) {
-              MaterialRichText(
+              val astNode = remember(parser) {
+                parser.parse(sampleMarkdown)
+              }
+
+              val renderer = remember {
+                MyMediaRenderer()
+              }
+
+              RichText(
                 style = richTextStyle,
+                linkClickHandler = {
+                  Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                },
+                renderer = renderer,
                 modifier = Modifier.padding(8.dp),
               ) {
-                Markdown(
-                  content = sampleMarkdown,
-                  markdownParseOptions = markdownParseOptions,
-                  onLinkClicked = {
-                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                  },
-                  mediaRenderer = renderer,
-                )
+                BasicMarkdown(astNode)
               }
             }
           }
@@ -139,7 +156,7 @@ import com.halilibo.richtext.ui.resolveDefaults
   }
 }
 
-private class MyMediaRenderer(onClick: (String) -> Unit): DefaultMediaRenderer(onClick) {
+class MyMediaRenderer: BasicMediaRenderer() {
   override fun renderNostrUri(uri: String, helper: UriComposableRenderer) {
     helper.renderInline {
       Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
@@ -243,6 +260,16 @@ private val sampleMarkdown = """
   * Unordered list can use asterisks
   - Or minuses
   + Or pluses
+<!-- -->
+  2. Ordered list starting with `2.`
+  3. Another item
+<!-- -->
+  0. Ordered list starting with `0.`
+<!-- -->
+  003. Ordered list starting with `003.`
+<!-- -->
+  -1. Starting with `-1.` should not be list
+
 
   ---
 

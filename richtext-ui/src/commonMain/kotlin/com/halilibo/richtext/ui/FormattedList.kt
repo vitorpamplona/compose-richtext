@@ -184,7 +184,7 @@ private val LocalListLevel = compositionLocalOf { 0 }
 @Composable public inline fun RichTextScope.FormattedList(
   listType: ListType,
   vararg children: @Composable RichTextScope.() -> Unit
-): Unit = FormattedList(listType, children.asList()) { it() }
+): Unit = FormattedList(listType, children.asList(), 0) { it() }
 
 /**
  * Creates a formatted list such as a bullet list or numbered list.
@@ -195,6 +195,7 @@ private val LocalListLevel = compositionLocalOf { 0 }
 @Composable public fun <T> RichTextScope.FormattedList(
   listType: ListType,
   items: List<T>,
+  startIndex: Int = 0,
   drawItem: @Composable RichTextScope.(T) -> Unit
 ) {
   val listStyle = currentRichTextStyle.resolveDefaults().listStyle!!
@@ -210,12 +211,12 @@ private val LocalListLevel = compositionLocalOf { 0 }
     prefixPadding = PaddingValues(start = markerIndent, end = contentsIndent),
     prefixForIndex = { index ->
       when (listType) {
-        Ordered -> listStyle.orderedMarkers!!().drawMarker(currentLevel, index)
+        Ordered -> listStyle.orderedMarkers!!().drawMarker(currentLevel, startIndex + index)
         Unordered -> listStyle.unorderedMarkers!!().drawMarker(currentLevel)
       }
     },
     itemForIndex = { index ->
-      RichText(style = currentRichTextStyle.copy(paragraphSpacing = listStyle.itemSpacing)) {
+      BasicRichText(style = currentRichTextStyle.copy(paragraphSpacing = listStyle.itemSpacing)) {
         CompositionLocalProvider(LocalListLevel provides currentLevel + 1) {
           drawItem(items[index])
         }
@@ -292,8 +293,8 @@ private val LocalListLevel = compositionLocalOf { 0 }
           layoutDirection = layoutDirection
         )
 
-        prefix.place(prefixOffset.x, y + prefixOffset.y)
-        item.place(widestPrefix.width, y)
+        prefix.placeRelative(prefixOffset.x, y + prefixOffset.y)
+        item.placeRelative(widestPrefix.width, y)
         y += rowHeight
       }
     }
