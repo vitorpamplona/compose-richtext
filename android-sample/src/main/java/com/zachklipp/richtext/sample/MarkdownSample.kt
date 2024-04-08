@@ -69,9 +69,10 @@ import com.halilibo.richtext.ui.string.RichTextString
     )
   }
   LaunchedEffect(isAutolinkEnabled) {
-    markdownParseOptions = markdownParseOptions.copy(
-      autolink = isAutolinkEnabled,
-    )
+    markdownParseOptions = if (isAutolinkEnabled)
+      MarkdownParseOptions.MarkdownWithLinks
+    else
+      MarkdownParseOptions.MarkdownOnly
   }
 
   val colors = if (isDarkModeEnabled) darkColorScheme() else lightColorScheme()

@@ -3,11 +3,11 @@ package com.halilibo.richtext.commonmark
 import org.commonmark.Extension
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomNode
-import org.commonmark.node.Hashtag
 import org.commonmark.node.Link
 import org.commonmark.node.Node
 import org.commonmark.node.SourceSpan
 import org.commonmark.node.Text
+import org.commonmark.node.Visitor
 import org.commonmark.parser.Parser.Builder
 import org.commonmark.parser.Parser.ParserExtension
 import org.commonmark.parser.PostProcessor
@@ -116,5 +116,17 @@ public class AutolinkHashtagPostProcessor : PostProcessor {
       insertAfterNode.insertAfter(node)
       return node
     }
+  }
+}
+
+public class Hashtag public constructor(tagSource: String) : CustomNode() {
+  public var tag: String = tagSource
+
+  override fun accept(visitor: Visitor) {
+    visitor.visit(this)
+  }
+
+  override fun toStringAttributes(): String {
+    return "tag=$tag"
   }
 }

@@ -54,7 +54,6 @@ import org.commonmark.node.Document
 import org.commonmark.node.Emphasis
 import org.commonmark.node.FencedCodeBlock
 import org.commonmark.node.HardLineBreak
-import org.commonmark.node.Hashtag
 import org.commonmark.node.Heading
 import org.commonmark.node.HtmlBlock
 import org.commonmark.node.HtmlInline
@@ -64,7 +63,6 @@ import org.commonmark.node.Link
 import org.commonmark.node.LinkReferenceDefinition
 import org.commonmark.node.ListItem
 import org.commonmark.node.Node
-import org.commonmark.node.NostrUri
 import org.commonmark.node.OrderedList
 import org.commonmark.node.Paragraph
 import org.commonmark.node.SoftLineBreak
@@ -206,15 +204,7 @@ public actual class CommonmarkAstNodeParser actual constructor(
   options: MarkdownParseOptions
 ) {
   private val parser = Parser.builder()
-    .extensions(
-      listOfNotNull(
-        TablesExtension.create(),
-        StrikethroughExtension.create(),
-        if (options.autolink) AutolinkExtension.create() else null,
-        if (options.autolink) NostrUriExtension.create() else null,
-        if (options.autolink) HashtagExtension.create() else null
-      )
-    )
+    .extensions(options.extensions)
     .build()
 
   public actual fun parse(text: String): AstNode {
