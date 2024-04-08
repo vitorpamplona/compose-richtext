@@ -80,12 +80,6 @@ public class AutolinkNostrPostProcessor : PostProcessor {
       inLink--
     }
 
-    override fun visit(link: CustomNode) {
-      inLink++
-      super.visit(link)
-      inLink--
-    }
-
     override fun visit(text: Text) {
       if (inLink == 0) {
         linkify(text)
