@@ -9,6 +9,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import com.halilibo.richtext.ui.BasicRichText
 import com.halilibo.richtext.ui.LinkClickHandler
+import com.halilibo.richtext.ui.LocalLinkClickHandler
+import com.halilibo.richtext.ui.LocalOnUriCompose
 import com.halilibo.richtext.ui.MediaRenderer
 import com.halilibo.richtext.ui.RichTextScope
 import com.halilibo.richtext.ui.RichTextStyle
@@ -30,13 +32,16 @@ public fun RichText(
   children: @Composable RichTextScope.() -> Unit
 ) {
   RichTextMaterialTheme {
-    BasicRichText(
-      modifier = modifier,
-      style = style,
-      linkClickHandler = linkClickHandler,
-      mediaRenderer = renderer,
-      children = children
-    )
+    CompositionLocalProvider(
+      LocalLinkClickHandler provides linkClickHandler,
+      LocalOnUriCompose provides renderer
+    ) {
+      BasicRichText(
+        modifier = modifier,
+        style = style,
+        children = children
+      )
+    }
   }
 }
 

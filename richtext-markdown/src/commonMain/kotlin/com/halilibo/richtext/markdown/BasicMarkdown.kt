@@ -10,13 +10,16 @@ import androidx.compose.ui.semantics.semantics
 import com.halilibo.richtext.markdown.node.AstBlockQuote
 import com.halilibo.richtext.markdown.node.AstDocument
 import com.halilibo.richtext.markdown.node.AstFencedCodeBlock
+import com.halilibo.richtext.markdown.node.AstHashtag
 import com.halilibo.richtext.markdown.node.AstHeading
 import com.halilibo.richtext.markdown.node.AstHtmlBlock
+import com.halilibo.richtext.markdown.node.AstImage
 import com.halilibo.richtext.markdown.node.AstIndentedCodeBlock
 import com.halilibo.richtext.markdown.node.AstInlineNodeType
 import com.halilibo.richtext.markdown.node.AstLinkReferenceDefinition
 import com.halilibo.richtext.markdown.node.AstListItem
 import com.halilibo.richtext.markdown.node.AstNode
+import com.halilibo.richtext.markdown.node.AstNostrUri
 import com.halilibo.richtext.markdown.node.AstOrderedList
 import com.halilibo.richtext.markdown.node.AstParagraph
 import com.halilibo.richtext.markdown.node.AstTableBody
@@ -154,6 +157,15 @@ internal fun RichTextScope.RecursiveRenderMarkdownAst(astNode: AstNode?) {
       // TODO(halilozercan) use multiplatform compatible stderr logging
       println("Unexpected raw text while traversing the Abstract Syntax Tree.")
       Text(richTextString { append(astNodeType.literal) })
+    }
+    is AstNostrUri -> {
+      println("MarkdownRichText: Unexpected AstNostrUri while traversing the Abstract Syntax Tree.")
+    }
+    is AstHashtag -> {
+      println("MarkdownRichText: Unexpected AstHashtag while traversing the Abstract Syntax Tree.")
+    }
+    is AstImage -> {
+      println("MarkdownRichText: Unexpected AstImage while traversing the Abstract Syntax Tree.")
     }
     is AstListItem -> {
       println("MarkdownRichText: Unexpected AstListItem while traversing the Abstract Syntax Tree.")
