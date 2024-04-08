@@ -54,7 +54,6 @@ import com.halilibo.richtext.ui.currentRichTextStyle
 import com.halilibo.richtext.ui.material.RichText
 import com.halilibo.richtext.ui.resolveDefaults
 import com.halilibo.richtext.ui.string.RichTextString
-import com.halilibo.richtext.ui.string.UriComposableRenderer
 
 fun main(): Unit = singleWindowApplication(
   title = "RichText KMP"
