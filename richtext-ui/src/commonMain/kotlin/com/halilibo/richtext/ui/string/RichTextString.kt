@@ -298,6 +298,18 @@ public data class RichTextString internal constructor(
       formatObjects["inline:$tag"] = content
       builder.appendInlineContent(tag, alternateText)
     }
+    public fun appendInlineContentFullWidth(
+      alternateText: String = REPLACEMENT_CHAR,
+      content: InlineContent
+    ) {
+      val tag = randomUUID()
+      formatObjects["inline:$tag"] = content
+
+      // Images in the middle of the paragraph should break the paragraph to show preview.
+      builder.pushStyle(ParagraphStyle())
+      builder.appendInlineContent(tag, alternateText)
+      builder.pop()
+    }
 
     /**
      * Provides access to the underlying builder, which can be used to add arbitrary formatting,
