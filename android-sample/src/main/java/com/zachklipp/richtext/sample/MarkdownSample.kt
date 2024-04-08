@@ -160,9 +160,7 @@ import com.halilibo.richtext.ui.string.RichTextString
 class MyMediaRenderer: BasicMediaRenderer() {
   override fun renderNostrUri(uri: String, richTextStringBuilder: RichTextString.Builder) {
     renderInline(richTextStringBuilder) {
-      Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
-        Text("Cool rendering of ${uri}")
-      }
+      Text("${uri}")
     }
   }
 
@@ -249,8 +247,8 @@ private val sampleMarkdown = """
   2. Another item
       * Unordered sub-list.
   1. Actual numbers don't matter, just that it's a number
-      1. Ordered sub-list nostr:nprofile1qyw8
-  4. And another item. nostr:nprofile1qyw8
+      1. Ordered sub-list nostr:nprofile1qyw8 continuing right here with a long text that is really long.
+  4. And another item. nostr:nprofile1qyw8 
 
       You can have properly indented paragraphs within list items. Notice the blank line above, and the leading spaces (at least one, but we'll use three here to also align the raw Markdown).
 

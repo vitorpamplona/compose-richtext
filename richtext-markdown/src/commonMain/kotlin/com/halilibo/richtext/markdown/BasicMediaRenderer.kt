@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import com.halilibo.richtext.ui.MediaRenderer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.PlaceholderVerticalAlign.Companion
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.halilibo.richtext.ui.string.InlineContent
@@ -45,7 +47,8 @@ public open class BasicMediaRenderer: MediaRenderer {
       content = InlineContent(
         initialSize = {
           IntSize(128.dp.roundToPx(), 128.dp.roundToPx())
-        }
+        },
+        placeholderVerticalAlign = PlaceholderVerticalAlign.TextBottom
       ) {
         innerComposable()
       }
