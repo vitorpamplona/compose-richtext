@@ -29,7 +29,7 @@ public open class BasicMediaRenderer: MediaRenderer {
   }
 
   override fun renderLinkPreview(title: String?, uri: String, richTextStringBuilder: RichTextString.Builder) {
-    renderAsCompleteLink(uri, uri, richTextStringBuilder)
+    renderAsCompleteLink(title ?: uri, uri, richTextStringBuilder)
   }
 
   override fun renderNostrUri(uri: String, richTextStringBuilder: RichTextString.Builder) {

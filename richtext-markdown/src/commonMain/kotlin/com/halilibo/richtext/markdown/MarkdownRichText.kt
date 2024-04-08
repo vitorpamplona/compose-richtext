@@ -111,9 +111,17 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
           null
         }
         is AstLink -> {
-          if (renderer.shouldRenderLinkPreview(currentNodeType.title, currentNodeType.destination)) {
+          val title = currentNodeType.title ?: currentNode.childrenSequence().joinToString {
+            if (it.type is AstText) {
+              it.type.literal
+            } else {
+              ""
+            }
+          }
+
+          if (renderer.shouldRenderLinkPreview(title, currentNodeType.destination)) {
             skipChildren = true
-            renderer.renderLinkPreview(currentNodeType.title, currentNodeType.destination, richTextStringBuilder)
+            renderer.renderLinkPreview(title, currentNodeType.destination, richTextStringBuilder)
             null
           } else {
             richTextStringBuilder.pushFormat(
