@@ -54,11 +54,6 @@ public class AutolinkNostrPostProcessor : PostProcessor {
       lastNode = insertNode(linkNode, lastNode)
 
       index = matcher.end()
-
-      // removes space after the uri
-      if (index < literal.length && literal[index] == ' ') {
-        index++
-      }
     }
 
     if (index != 0) {
