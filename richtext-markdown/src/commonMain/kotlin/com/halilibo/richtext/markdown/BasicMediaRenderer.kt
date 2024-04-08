@@ -1,18 +1,22 @@
 package com.halilibo.richtext.markdown
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.Composable
 import com.halilibo.richtext.ui.MediaRenderer
-import com.halilibo.richtext.ui.string.UriComposableRenderer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import com.halilibo.richtext.ui.string.InlineContent
+import com.halilibo.richtext.ui.string.RichTextString
 
 public object DefaultMediaRenderer: BasicMediaRenderer() {
 
 }
 
 public open class BasicMediaRenderer: MediaRenderer {
-  override fun renderImage(title: String?, uri: String, helper: UriComposableRenderer) {
-    helper.renderInline {
+  override fun renderImage(title: String?, uri: String, richTextStringBuilder: RichTextString.Builder) {
+    renderInline(richTextStringBuilder) {
       RemoteImage(
         url = uri,
         contentDescription = title,
@@ -22,17 +26,36 @@ public open class BasicMediaRenderer: MediaRenderer {
     }
   }
 
-  override fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer) {
-    helper.renderAsCompleteLink(uri, uri)
+  override fun renderLinkPreview(title: String?, uri: String, richTextStringBuilder: RichTextString.Builder) {
+    renderAsCompleteLink(uri, uri, richTextStringBuilder)
   }
 
-  override fun renderNostrUri(uri: String, helper: UriComposableRenderer) {
-    helper.renderAsCompleteLink(uri, uri)
+  override fun renderNostrUri(uri: String, richTextStringBuilder: RichTextString.Builder) {
+    renderAsCompleteLink(uri, uri, richTextStringBuilder)
   }
 
-  override fun renderHashtag(tag: String, helper: UriComposableRenderer) {
-    helper.renderAsCompleteLink(tag, "hashtag:${tag}")
+  override fun renderHashtag(tag: String, richTextStringBuilder: RichTextString.Builder) {
+    renderAsCompleteLink(tag, "hashtag:${tag}", richTextStringBuilder)
   }
 
   override fun shouldRenderLinkPreview(uri: String): Boolean { return false }
+
+  public fun renderInline(richTextStringBuilder: RichTextString.Builder, innerComposable: @Composable () -> Unit) {
+    richTextStringBuilder.appendInlineContent(
+      content = InlineContent(
+        initialSize = {
+          IntSize(128.dp.roundToPx(), 128.dp.roundToPx())
+        }
+      ) {
+        innerComposable()
+      }
+    )
+  }
+  public fun renderAsCompleteLink(title: String, destination: String, richTextStringBuilder: RichTextString.Builder) {
+    richTextStringBuilder.pushFormat(
+      RichTextString.Format.Link(destination = destination)
+    )
+    richTextStringBuilder.append(title)
+    richTextStringBuilder.pop()
+  }
 }

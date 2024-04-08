@@ -29,7 +29,6 @@ import com.halilibo.richtext.ui.MediaRenderer
 import com.halilibo.richtext.ui.RichTextScope
 import com.halilibo.richtext.ui.string.RichTextString
 import com.halilibo.richtext.ui.string.Text
-import com.halilibo.richtext.ui.string.UriComposableRenderer
 import com.halilibo.richtext.ui.string.withFormat
 
 /**
@@ -69,7 +68,6 @@ internal fun RichTextScope.MarkdownRichText(astNode: AstNode, modifier: Modifier
 
 private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): RichTextString {
   val richTextStringBuilder = RichTextString.Builder()
-  val helper = UriComposableRenderer(richTextStringBuilder)
 
   // Modified pre-order traversal with pushFormat, popFormat support.
   var iteratorStack = listOf(
@@ -101,21 +99,21 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
           RichTextString.Format.Strikethrough
         )
         is AstImage -> {
-          renderer.renderImage(currentNodeType.title, currentNodeType.destination, helper)
+          renderer.renderImage(currentNodeType.title, currentNodeType.destination, richTextStringBuilder)
           null
         }
         is AstNostrUri -> {
-          renderer.renderNostrUri(currentNodeType.destination, helper)
+          renderer.renderNostrUri(currentNodeType.destination, richTextStringBuilder)
           null
         }
         is AstHashtag -> {
-          renderer.renderHashtag(currentNodeType.tag, helper)
+          renderer.renderHashtag(currentNodeType.tag, richTextStringBuilder)
           null
         }
         is AstLink -> {
           if (renderer.shouldRenderLinkPreview(currentNodeType.destination)) {
             skipChildren = true
-            renderer.renderLinkPreview(currentNodeType.title, currentNodeType.destination, helper)
+            renderer.renderLinkPreview(currentNodeType.title, currentNodeType.destination, richTextStringBuilder)
             null
           } else {
             richTextStringBuilder.pushFormat(

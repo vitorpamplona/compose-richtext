@@ -45,7 +45,7 @@ import com.halilibo.richtext.markdown.BasicMediaRenderer
 import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.material3.RichText
 import com.halilibo.richtext.ui.resolveDefaults
-import com.halilibo.richtext.ui.string.UriComposableRenderer
+import com.halilibo.richtext.ui.string.RichTextString
 
 @Preview
 @Composable private fun MarkdownSamplePreview() {
@@ -157,16 +157,16 @@ import com.halilibo.richtext.ui.string.UriComposableRenderer
 }
 
 class MyMediaRenderer: BasicMediaRenderer() {
-  override fun renderNostrUri(uri: String, helper: UriComposableRenderer) {
-    helper.renderInline {
+  override fun renderNostrUri(uri: String, richTextStringBuilder: RichTextString.Builder) {
+    renderInline(richTextStringBuilder) {
       Box(modifier = Modifier.fillMaxWidth().border(1.dp, Color.Gray).padding(10.dp)) {
         Text("Cool rendering of ${uri}")
       }
     }
   }
 
-  override fun renderLinkPreview(title: String?, uri: String, helper: UriComposableRenderer) {
-    helper.renderInline {
+  override fun renderLinkPreview(title: String?, uri: String, richTextStringBuilder: RichTextString.Builder) {
+    renderInline(richTextStringBuilder) {
       RemoteImage(
         url = uri,
         contentDescription = title,
