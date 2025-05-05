@@ -284,6 +284,10 @@ private val sampleMarkdown = """
 
   Or leave it empty and use the [link text itself].
   
+  Fake hashtag link: [#Amethyst](https://www.google.com)
+  
+  Fake profile link: [@Amethyst](https://www.google.com)
+  
   Autolink option will detect text links like https://www.google.com and turn them into Markdown links automatically.
 
   ---
