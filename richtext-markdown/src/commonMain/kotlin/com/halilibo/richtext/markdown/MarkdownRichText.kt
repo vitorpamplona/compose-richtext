@@ -139,7 +139,12 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
         }
         is AstStrongEmphasis -> richTextStringBuilder.pushFormat(RichTextString.Format.Bold)
         is AstText -> {
-          richTextStringBuilder.append(currentNodeType.literal)
+          if (currentNode.links.parent?.type is AstLink) {
+            richTextStringBuilder.append(stripHashAndAt(currentNodeType.literal))
+          } else {
+            richTextStringBuilder.append(currentNodeType.literal)
+          }
+
           null
         }
         is AstLinkReferenceDefinition -> richTextStringBuilder.pushFormat(
@@ -176,6 +181,8 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
 
   return richTextStringBuilder.toRichTextString()
 }
+
+private fun stripHashAndAt(input: String): String = input.filterNot { it == '#' || it == '@' }
 
 private data class AstNodeTraversalEntry(
   val astNode: AstNode,
