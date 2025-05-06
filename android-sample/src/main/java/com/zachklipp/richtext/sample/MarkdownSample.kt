@@ -1,10 +1,8 @@
 package com.zachklipp.richtext.sample
 
 import android.widget.Toast
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -30,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -160,7 +157,7 @@ import com.halilibo.richtext.ui.string.RichTextString
 class MyMediaRenderer: BasicMediaRenderer() {
   override fun renderNostrUri(uri: String, richTextStringBuilder: RichTextString.Builder) {
     renderInline(richTextStringBuilder) {
-      Text("${uri}")
+      Text(uri)
     }
   }
 
@@ -176,6 +173,8 @@ class MyMediaRenderer: BasicMediaRenderer() {
   }
 
   override fun shouldRenderLinkPreview(title: String?, uri: String): Boolean { return uri.contains("image%2Fjpeg") }
+
+  override fun shouldSanitizeUriLabel(): Boolean { return true }
 }
 
 @Composable

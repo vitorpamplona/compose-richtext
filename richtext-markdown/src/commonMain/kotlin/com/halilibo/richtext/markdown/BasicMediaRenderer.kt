@@ -6,7 +6,6 @@ import com.halilibo.richtext.ui.MediaRenderer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.PlaceholderVerticalAlign.Companion
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.halilibo.richtext.ui.string.InlineContent
@@ -41,6 +40,8 @@ public open class BasicMediaRenderer: MediaRenderer {
   }
 
   override fun shouldRenderLinkPreview(title: String?, uri: String): Boolean { return false }
+
+  override fun shouldSanitizeUriLabel(): Boolean { return false }
 
   public fun renderInline(richTextStringBuilder: RichTextString.Builder, innerComposable: @Composable () -> Unit) {
     richTextStringBuilder.appendInlineContent(
