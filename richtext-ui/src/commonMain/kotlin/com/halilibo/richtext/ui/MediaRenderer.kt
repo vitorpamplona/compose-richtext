@@ -13,4 +13,5 @@ public interface MediaRenderer {
   public fun renderLinkPreview(title: String?, uri: String, richTextStringBuilder: RichTextString.Builder)
   public fun shouldRenderLinkPreview(title: String?, uri: String): Boolean
   public fun shouldSanitizeUriLabel(): Boolean
+  public fun sanitizeUriLabel(label: String): String
 }

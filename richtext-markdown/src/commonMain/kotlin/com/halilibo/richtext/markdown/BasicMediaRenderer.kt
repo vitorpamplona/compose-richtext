@@ -43,6 +43,8 @@ public open class BasicMediaRenderer: MediaRenderer {
 
   override fun shouldSanitizeUriLabel(): Boolean { return false }
 
+  override fun sanitizeUriLabel(label: String): String { return label }
+
   public fun renderInline(richTextStringBuilder: RichTextString.Builder, innerComposable: @Composable () -> Unit) {
     richTextStringBuilder.appendInlineContent(
       content = InlineContent(

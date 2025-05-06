@@ -141,7 +141,7 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
         is AstText -> {
           val text = currentNodeType.literal
           val sanitizedText = if (renderer.shouldSanitizeUriLabel() && currentNode.links.parent?.type is AstLink) {
-            stripHashAndAt(text)
+            renderer.sanitizeUriLabel(text)
           } else {
             text
           }
@@ -183,8 +183,6 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
 
   return richTextStringBuilder.toRichTextString()
 }
-
-private fun stripHashAndAt(input: String): String = input.filterNot { it == '#' || it == '@' }
 
 private data class AstNodeTraversalEntry(
   val astNode: AstNode,
