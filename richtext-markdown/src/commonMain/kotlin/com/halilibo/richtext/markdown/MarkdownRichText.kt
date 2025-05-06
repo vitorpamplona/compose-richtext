@@ -140,7 +140,7 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
         is AstStrongEmphasis -> richTextStringBuilder.pushFormat(RichTextString.Format.Bold)
         is AstText -> {
           if (renderer.shouldSanitizeUriLabel() && currentNode.links.parent?.type is AstLink) {
-            renderer.sanitizeUriLabel(currentNodeType.literal)
+            richTextStringBuilder.append(renderer.sanitizeUriLabel(currentNodeType.literal))
           } else {
             richTextStringBuilder.append(currentNodeType.literal)
           }
