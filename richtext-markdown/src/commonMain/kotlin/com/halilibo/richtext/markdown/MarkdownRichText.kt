@@ -139,14 +139,11 @@ private fun computeRichTextString(astNode: AstNode, renderer: MediaRenderer): Ri
         }
         is AstStrongEmphasis -> richTextStringBuilder.pushFormat(RichTextString.Format.Bold)
         is AstText -> {
-          val text = currentNodeType.literal
-          val sanitizedText = if (renderer.shouldSanitizeUriLabel() && currentNode.links.parent?.type is AstLink) {
-            renderer.sanitizeUriLabel(text)
+          if (renderer.shouldSanitizeUriLabel() && currentNode.links.parent?.type is AstLink) {
+            renderer.sanitizeUriLabel(currentNodeType.literal)
           } else {
-            text
+            richTextStringBuilder.append(currentNodeType.literal)
           }
-          richTextStringBuilder.append(sanitizedText)
-
           null
         }
         is AstLinkReferenceDefinition -> richTextStringBuilder.pushFormat(
