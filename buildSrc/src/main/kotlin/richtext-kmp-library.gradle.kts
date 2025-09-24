@@ -16,8 +16,8 @@ kotlin {
   jvm()
   androidTarget {
     publishLibraryVariants("release")
-    compilations.all {
-      kotlinOptions.jvmTarget = JvmTarget.JVM_21.target
+    compilerOptions {
+      jvmTarget.set(JvmTarget.JVM_21)
     }
   }
   explicitApi()

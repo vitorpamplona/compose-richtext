@@ -27,13 +27,8 @@ public actual fun MarkdownImage(
   contentScale: ContentScale
 ) {
   val image by produceState<ImageBitmap?>(null, url) {
-    if (url.startsWith("data:image") && url.contains("base64")) {
-      val base64ImageString = url.substringAfter("base64,")
-      value = makeFromEncoded(Base64.getDecoder().decode(base64ImageString)).toComposeImageBitmap()
-    } else {
-      loadFullImage(url)?.let {
-        value = makeFromEncoded(toByteArray(it)).toComposeImageBitmap()
-      }
+    loadFullImage(url)?.let {
+      value = makeFromEncoded(toByteArray(it)).toComposeImageBitmap()
     }
   }
 
@@ -58,6 +53,7 @@ private suspend fun loadFullImage(source: String): BufferedImage? = withContext(
     val url = URL(source)
     val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
     connection.connectTimeout = 5000
+    connection.setRequestProperty("User-Agent", "MarkdownDemo");
     connection.connect()
 
     val input: InputStream = connection.inputStream

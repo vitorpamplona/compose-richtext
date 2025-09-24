@@ -7,6 +7,9 @@ plugins {
 
 kotlin {
   explicitApi()
+  compilerOptions {
+    jvmTarget = JvmTarget.JVM_21
+  }
 }
 
 android {
@@ -20,9 +23,6 @@ android {
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-  }
-  kotlinOptions {
-    jvmTarget = JvmTarget.JVM_21.toString()
   }
 
   buildFeatures {

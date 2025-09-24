@@ -1,3 +1,5 @@
+import Compose.coilHttp
+
 plugins {
   id("richtext-kmp-library")
   id("org.jetbrains.compose") version Compose.desktopVersion
@@ -27,6 +29,7 @@ kotlin {
     val androidMain by getting {
       dependencies {
         implementation(Compose.coil)
+        implementation(Compose.coilHttp)
       }
     }
 
