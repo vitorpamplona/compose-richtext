@@ -1,5 +1,7 @@
 package com.halilibo.richtext.markdown
 
+import android.annotation.SuppressLint
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.size
@@ -21,18 +23,19 @@ import coil.size.Size
 private val DEFAULT_IMAGE_SIZE = 64.dp
 
 /**
- * Implementation of RemoteImage by using Coil library for Android.
+ * Implementation of MarkdownImage by using Coil library for Android.
  */
 @Composable
-public actual fun RemoteImage(
+public actual fun MarkdownImage(
   url: String,
   contentDescription: String?,
   modifier: Modifier,
   contentScale: ContentScale
 ) {
+  val data = url
   val painter = rememberAsyncImagePainter(
     ImageRequest.Builder(LocalContext.current)
-      .data(data = url)
+      .data(data = data)
       .size(Size.ORIGINAL)
       .crossfade(true)
       .build()
@@ -40,6 +43,7 @@ public actual fun RemoteImage(
 
   val density = LocalDensity.current
 
+  @SuppressLint("UnusedBoxWithConstraintsScope")
   BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
     val sizeModifier by remember(density, painter) {
       derivedStateOf {

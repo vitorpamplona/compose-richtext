@@ -201,7 +201,7 @@ internal fun convert(
 }
 
 public actual class CommonmarkAstNodeParser actual constructor(
-  options: MarkdownParseOptions
+  options: CommonMarkdownParseOptions
 ) {
   private val parser = Parser.builder()
     .extensions(options.extensions)

@@ -1,13 +1,10 @@
 object BuildPlugins {
   // keep in sync with buildSrc/build.gradle.kts
-  val androidGradlePlugin = "com.android.tools.build:gradle:8.2.0"
+  val androidGradlePlugin = "com.android.tools.build:gradle:8.7.0"
 }
 
 object AndroidX {
-  val activity = "androidx.activity:activity:1.5.0-rc01"
-  val annotations = "androidx.annotation:annotation:1.1.0"
   val appcompat = "androidx.appcompat:appcompat:1.3.0"
-  val material = "com.google.android.material:material:1.1.0"
 }
 
 object Network {
@@ -16,7 +13,7 @@ object Network {
 
 object Kotlin {
   // keep in sync with buildSrc/build.gradle.kts
-  val version = "1.9.22"
+  val version = "2.0.21"
   val binaryCompatibilityValidatorPlugin = "org.jetbrains.kotlinx:binary-compatibility-validator:0.9.0"
   val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
 
@@ -30,18 +27,14 @@ object Kotlin {
 val ktlint = "org.jlleitschuh.gradle:ktlint-gradle:10.0.0"
 
 object Compose {
-  val version = "1.5.4"
-  val compilerVersion = "1.5.8"
-  val desktopVersion = "1.6.0"
+  val desktopVersion = "1.8.2"
   val activity = "androidx.activity:activity-compose:1.8.2"
-  val annotatedText = "io.github.aghajari:AnnotatedText:1.0.3"
-  val toolingData = "androidx.compose.ui:ui-tooling-data:$version"
-  val multiplatformUiUtil = "org.jetbrains.compose.ui:ui-util:$desktopVersion"
+  val toolingData = "androidx.compose.ui:ui-tooling-data:1.6.0"
   val coil = "io.coil-kt:coil-compose:2.5.0"
 }
 
 object Commonmark {
-  private val version = "0.21.0"
+  private val version = "0.25.0"
   val core = "org.commonmark:commonmark:$version"
   val tables = "org.commonmark:commonmark-ext-gfm-tables:$version"
   val strikethrough = "org.commonmark:commonmark-ext-gfm-strikethrough:$version"
@@ -49,7 +42,7 @@ object Commonmark {
 }
 
 object AndroidConfiguration {
-  val minSdk = 21
-  val targetSdk = 34
+  val minSdk = 23
+  val targetSdk = 35
   val compileSdk = targetSdk
 }

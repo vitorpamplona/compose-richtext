@@ -18,7 +18,7 @@ public object DefaultMediaRenderer: BasicMediaRenderer() {
 public open class BasicMediaRenderer: MediaRenderer {
   override fun renderImage(title: String?, uri: String, richTextStringBuilder: RichTextString.Builder) {
     renderInline(richTextStringBuilder) {
-      RemoteImage(
+      MarkdownImage(
         url = uri,
         contentDescription = title,
         modifier = Modifier.fillMaxWidth(),

@@ -1,6 +1,7 @@
 plugins {
   id("richtext-kmp-library")
   id("org.jetbrains.compose") version Compose.desktopVersion
+  id("org.jetbrains.kotlin.plugin.compose") version Kotlin.version
   id("org.jetbrains.dokka")
 }
 
@@ -18,8 +19,6 @@ kotlin {
       dependencies {
         implementation(compose.runtime)
         implementation(compose.foundation)
-
-        @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
         implementation(compose.material3)
 
         api(project(":richtext-ui"))

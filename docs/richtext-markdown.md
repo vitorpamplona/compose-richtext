@@ -4,7 +4,7 @@
 [![JVM Library](https://img.shields.io/badge/Platform-JVM-red.svg?style=for-the-badge)](https://kotlinlang.org/docs/mpp-intro.html)
 
 Library for rendering Markdown tree that is defined as an `AstNode`. This module would be useless
-for someone who is looking to just render a Markdown string. Please take a look to 
+for someone who is looking to just render a Markdown string. Please check out 
 `richtext-commonmark` for such features. `richtext-markdown` behaves as sort of a building block.
 You can create your own parser or use 3rd party ones that converts any Markdown string to an 
 `AstNode` tree.
@@ -19,7 +19,7 @@ dependencies {
 
 ## Rendering
 
-The simplest way to render markdown is just pass an `AstNode` to the [`Markdown`](../api/richtext-commonmark/com.halilibo.richtext.markdown/-markdown.html)
+The simplest way to render markdown is just pass an `AstNode` to the [`BasicMarkdown`](../api/richtext-markdown/com.halilibo.richtext.markdown/-basic-markdown.html)
 composable under RichText scope:
 
 ~~~kotlin

@@ -1,6 +1,5 @@
 package com.zachklipp.richtext.sample
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,8 +14,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,10 +26,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.halilibo.richtext.commonmark.CommonMarkdownParseOptions
 import com.halilibo.richtext.commonmark.CommonmarkAstNodeParser
-import com.halilibo.richtext.commonmark.MarkdownParseOptions
 import com.halilibo.richtext.markdown.BasicMarkdown
-import com.halilibo.richtext.ui.MediaRenderer
 import com.halilibo.richtext.markdown.node.AstDocument
 import com.halilibo.richtext.markdown.node.AstNode
 import com.halilibo.richtext.ui.RichTextScope
@@ -51,7 +47,7 @@ import com.halilibo.richtext.ui.resolveDefaults
   var richTextStyle by remember { mutableStateOf(RichTextStyle().resolveDefaults()) }
   var isDarkModeEnabled by remember { mutableStateOf(false) }
   var isWordWrapEnabled by remember { mutableStateOf(true) }
-  var markdownParseOptions by remember { mutableStateOf(MarkdownParseOptions.Default) }
+  var markdownParseOptions by remember { mutableStateOf(CommonMarkdownParseOptions.Default) }
   var isAutolinkEnabled by remember { mutableStateOf(true) }
 
   LaunchedEffect(isWordWrapEnabled) {
@@ -63,15 +59,14 @@ import com.halilibo.richtext.ui.resolveDefaults
   }
   LaunchedEffect(isAutolinkEnabled) {
     markdownParseOptions = if (isAutolinkEnabled)
-      MarkdownParseOptions.MarkdownWithLinks
+      CommonMarkdownParseOptions.MarkdownWithLinks
     else
-      MarkdownParseOptions.MarkdownOnly
+      CommonMarkdownParseOptions.MarkdownOnly
   }
 
-  val colors = if (isDarkModeEnabled) darkColorScheme() else lightColorScheme()
   val context = LocalContext.current
 
-  SampleTheme(colorScheme = colors) {
+  SampleTheme(isDarkModeEnabled) {
     Surface {
       Column {
         // Config
@@ -121,15 +116,14 @@ import com.halilibo.richtext.ui.resolveDefaults
             MyMediaRenderer()
           }
 
-          RichText(
-            style = richTextStyle,
-            linkClickHandler = {
-              Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            },
-            renderer = renderer,
-            modifier = Modifier.padding(8.dp),
-          ) {
-            LazyMarkdown(astNode)
+          ProvideToastUriHandler(context) {
+            RichText(
+              style = richTextStyle,
+              modifier = Modifier.padding(8.dp),
+              renderer = renderer,
+            ) {
+              LazyMarkdown(astNode)
+            }
           }
         }
       }

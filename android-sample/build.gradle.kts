@@ -2,6 +2,7 @@ plugins {
   id("com.android.application")
   kotlin("android")
   id("org.jetbrains.compose") version Compose.desktopVersion
+  id("org.jetbrains.kotlin.plugin.compose") version Kotlin.version
 }
 
 android {
@@ -24,17 +25,11 @@ android {
   kotlinOptions {
     jvmTarget = "17"
   }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = Compose.compilerVersion
-  }
 }
 
 dependencies {
-  implementation(project(":printing"))
   implementation(project(":richtext-commonmark"))
   implementation(project(":richtext-ui-material3"))
-  implementation(project(":slideshow"))
   implementation(AndroidX.appcompat)
   implementation(Compose.activity)
   implementation(compose.foundation)

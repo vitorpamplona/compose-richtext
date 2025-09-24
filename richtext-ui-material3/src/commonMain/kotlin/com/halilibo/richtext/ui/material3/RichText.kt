@@ -27,13 +27,11 @@ import com.halilibo.richtext.ui.RichTextThemeProvider
 public fun RichText(
   modifier: Modifier = Modifier,
   style: RichTextStyle? = null,
-  linkClickHandler: LinkClickHandler? = null,
   renderer: MediaRenderer? = null,
   children: @Composable RichTextScope.() -> Unit
 ) {
   RichTextMaterialTheme {
     CompositionLocalProvider(
-      LocalLinkClickHandler provides linkClickHandler,
       LocalOnUriCompose provides renderer
     ) {
       BasicRichText(
