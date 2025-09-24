@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   id("com.android.library")
   kotlin("multiplatform")
@@ -15,7 +17,7 @@ kotlin {
   androidTarget {
     publishLibraryVariants("release")
     compilations.all {
-      kotlinOptions.jvmTarget = "17"
+      kotlinOptions.jvmTarget = JvmTarget.JVM_21.target
     }
   }
   explicitApi()
@@ -26,8 +28,8 @@ android {
   sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 
   defaultConfig {
