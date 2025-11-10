@@ -53,9 +53,7 @@ public actual fun MarkdownImage(
   @SuppressLint("UnusedBoxWithConstraintsScope")
   BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
     val painterState by painter.state.collectAsState()
-    val painterIntrinsicSize = painterState.painter?.intrinsicSize
-
-    val sizeModifier = renderInSize(painterIntrinsicSize)
+    val sizeModifier = renderInSize(painterState.painter?.intrinsicSize)
 
     Image(
       painter = painter,
