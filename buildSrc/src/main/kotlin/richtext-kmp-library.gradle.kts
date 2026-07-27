@@ -18,10 +18,12 @@ repositories {
   mavenCentral()
 }
 
+val signingKey = System.getenv("GPG_PRIVATE_KEY")?.replace("\\n", "\n")
+val signingPassword = System.getenv("GPG_PRIVATE_PASSWORD")
+val hasSigningKey = signingKey != null && signingPassword != null
+
 signing {
-  val signingKey = System.getenv("GPG_PRIVATE_KEY")?.replace("\\n", "\n")
-  val signingPassword = System.getenv("GPG_PRIVATE_PASSWORD")
-  if (signingKey != null && signingPassword != null) {
+  if (hasSigningKey) {
     useInMemoryPgpKeys(signingKey, signingPassword)
   }
 }
@@ -30,7 +32,11 @@ signing {
 // and ORG_GRADLE_PROJECT_mavenCentralPassword environment variables.
 mavenPublishing {
   publishToMavenCentral()
-  signAllPublications()
+  // Only sign when a key is available. Builders without one (JitPack, local
+  // publishToMavenLocal) would otherwise fail with "no configured signatory".
+  if (hasSigningKey) {
+    signAllPublications()
+  }
 }
 
 kotlin {
