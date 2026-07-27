@@ -1,58 +1,29 @@
 package com.halilibo.richtext.commonmark
 
-import org.commonmark.Extension
-import org.commonmark.ext.autolink.AutolinkExtension
-import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
-import org.commonmark.ext.gfm.tables.TablesExtension
-
 /**
- * Allows configuration of the Markdown parser
+ * Allows configuration of the Markdown parser.
  *
- * @param autolink Detect plain text links and turn them into Markdown links.
+ * The concrete parser extensions backing these options are platform-specific and are
+ * therefore not exposed here. Obtain an instance through one of the presets on the
+ * companion object ([Default], [MarkdownWithLinks], or [MarkdownOnly]).
  */
-public class CommonMarkdownParseOptions(
-  public val extensions: List<Extension>
-) {
-
-  override fun toString(): String {
-    return "CommonMarkdownParseOptions(extensions=$extensions)"
-  }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is CommonMarkdownParseOptions) return false
-
-    return extensions == other.extensions
-  }
-
-  override fun hashCode(): Int {
-    return extensions.hashCode()
-  }
-
-  public fun copy(
-    extensions: List<Extension> = this.extensions
-  ): CommonMarkdownParseOptions = CommonMarkdownParseOptions(
-    extensions = extensions
-  )
+public expect class CommonMarkdownParseOptions {
 
   public companion object {
-    public val MarkdownWithLinks: CommonMarkdownParseOptions = CommonMarkdownParseOptions(
-      listOfNotNull(
-        TablesExtension.create(),
-        StrikethroughExtension.create(),
-        AutolinkExtension.create(),
-        NostrUriExtension.create(),
-        HashtagExtension.create()
-      )
-    )
+    /**
+     * Parses Markdown with tables and strikethrough, and additionally autolinks plain text
+     * links as well as platform specific URIs (e.g. nostr) and hashtags.
+     */
+    public val MarkdownWithLinks: CommonMarkdownParseOptions
 
-    public val MarkdownOnly: CommonMarkdownParseOptions = CommonMarkdownParseOptions(
-      listOfNotNull(
-        TablesExtension.create(),
-        StrikethroughExtension.create()
-      )
-    )
+    /**
+     * Parses Markdown with tables and strikethrough, without any autolinking.
+     */
+    public val MarkdownOnly: CommonMarkdownParseOptions
 
-    public val Default: CommonMarkdownParseOptions = MarkdownWithLinks
+    /**
+     * The default parse options. Equivalent to [MarkdownWithLinks].
+     */
+    public val Default: CommonMarkdownParseOptions
   }
 }
