@@ -170,7 +170,7 @@ private val DefaultAstNodeComposer = object : AstBlockNodeComposer {
       is AstOrderedList -> {
         FormattedList(
           listType = Ordered,
-          items = astNode.childrenSequence().toList(),
+          items = astNode.filterChildrenType<AstListItem>().toList(),
           startIndex = astNodeType.startNumber - 1,
         ) { astListItem ->
           // if this list item has no child, it should at least emit a single pixel layout.

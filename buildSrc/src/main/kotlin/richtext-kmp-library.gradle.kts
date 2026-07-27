@@ -1,10 +1,16 @@
+import AndroidConfiguration.compileSdk
+import AndroidConfiguration.minSdk
+import AndroidConfiguration.targetSdk
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-  id("com.android.library")
   kotlin("multiplatform")
-  id("maven-publish")
-  id("signing")
+  id("com.android.kotlin.multiplatform.library")
+  id("org.jetbrains.kotlin.plugin.compose")
+  id("org.jetbrains.compose")
+  id("com.vanniktech.maven.publish")
+  id("org.jetbrains.dokka")
+  signing
 }
 
 repositories {
@@ -12,28 +18,32 @@ repositories {
   mavenCentral()
 }
 
+signing {
+  val signingKey = System.getenv("GPG_PRIVATE_KEY")?.replace("\\n", "\n")
+  val signingPassword = System.getenv("GPG_PRIVATE_PASSWORD")
+  if (signingKey != null && signingPassword != null) {
+    useInMemoryPgpKeys(signingKey, signingPassword)
+  }
+}
+
+// Maven Central credentials are provided via ORG_GRADLE_PROJECT_mavenCentralUsername
+// and ORG_GRADLE_PROJECT_mavenCentralPassword environment variables.
+mavenPublishing {
+  publishToMavenCentral()
+  signAllPublications()
+}
+
 kotlin {
   jvm()
-  androidTarget {
-    publishLibraryVariants("release")
+  explicitApi()
+
+  android {
+    compileSdk = 36
+    minSdk = AndroidConfiguration.minSdk
+
     compilerOptions {
-      jvmTarget.set(JvmTarget.JVM_21)
+      jvmTarget.set(JvmTarget.JVM_11)
     }
   }
-  explicitApi()
 }
 
-android {
-  compileSdk = 36
-  sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-  }
-
-  defaultConfig {
-    minSdk = 21
-    targetSdk = compileSdk
-  }
-}
