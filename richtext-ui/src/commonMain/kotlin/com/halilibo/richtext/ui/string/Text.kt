@@ -15,9 +15,8 @@ import com.halilibo.richtext.ui.string.RichTextString.Format
 
 /**
  * Renders a [RichTextString] as created with [richTextString].
- *
- * @sample com.halilibo.richtext.ui.previews.TextPreview
  */
+@Suppress("UnusedBoxWithConstraintsScope")
 @Composable
 public fun RichTextScope.Text(
   text: RichTextString,
@@ -42,7 +41,8 @@ public fun RichTextScope.Text(
       onTextLayout = onTextLayout,
       softWrap = softWrap,
       overflow = overflow,
-      maxLines = maxLines
+      maxLines = maxLines,
+      modifier = modifier,
     )
   } else {
     // expensive constraints reading path

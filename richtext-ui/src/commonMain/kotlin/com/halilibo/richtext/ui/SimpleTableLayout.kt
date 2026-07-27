@@ -39,15 +39,18 @@ internal fun SimpleTableLayout(
   SubcomposeLayout(modifier = modifier) { constraints ->
     val measurables = subcompose(false) {
       rows.forEach { row ->
-        check(row.size == columns)
-        row.forEach { cell ->
+        // Pad short rows with empty cells and ignore extras so the table renders even when
+        // callers (or upstream parsers) produce mismatched row widths.
+        row.take(columns).forEach { cell ->
           cell()
+        }
+        repeat((columns - row.size).coerceAtLeast(0)) {
+          Box(Modifier)
         }
       }
     }
 
-    val rowMeasurables = measurables.chunked(columns)
-    check(rowMeasurables.size == rows.size)
+    val rowMeasurables = if (columns > 0) measurables.chunked(columns) else emptyList()
 
     check(constraints.hasBoundedWidth) { "Table must have bounded width" }
     // Divide the width by the number of columns, then leave room for the padding.
@@ -68,7 +71,7 @@ internal fun SimpleTableLayout(
         cell.measure(cellConstraints)
       }
     }
-    val rowHeights = rowPlaceables.map { row -> row.maxByOrNull { it.height }!!.height }
+    val rowHeights = rowPlaceables.map { row -> row.maxOfOrNull { it.height } ?: 0 }
 
     val tableWidth = constraints.maxWidth
     val tableHeight = (rowHeights.sumOf { it } + cellSpacingHeight).roundToInt()
