@@ -44,7 +44,7 @@ kotlin {
   explicitApi()
 
   android {
-    compileSdk = 36
+    compileSdk = AndroidConfiguration.compileSdk
     minSdk = AndroidConfiguration.minSdk
 
     compilerOptions {

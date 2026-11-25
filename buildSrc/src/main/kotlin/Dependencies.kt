@@ -1,6 +1,6 @@
 object BuildPlugins {
   // keep in sync with buildSrc/build.gradle.kts
-  val androidGradlePlugin = "com.android.tools.build:gradle:9.1.0"
+  val androidGradlePlugin = "com.android.tools.build:gradle:9.5.0"
 }
 
 object AndroidX {
@@ -13,7 +13,7 @@ object Network {
 
 object Kotlin {
   // keep in sync with buildSrc/build.gradle.kts
-  val version = "2.3.10"
+  val version = "2.4.21"
   val binaryCompatibilityValidatorPlugin = "org.jetbrains.kotlinx:binary-compatibility-validator:0.9.0"
   val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
 
@@ -29,7 +29,7 @@ object Kotlin {
 val ktlint = "org.jlleitschuh.gradle:ktlint-gradle:10.0.0"
 
 object Compose {
-  val desktopVersion = "1.11.0-beta01"
+  val desktopVersion = "1.12.2"
 
   val jetbrainsComposePlugin = "org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:$desktopVersion"
   val activity = "androidx.activity:activity-compose:1.8.2"
@@ -48,6 +48,6 @@ object Commonmark {
 
 object AndroidConfiguration {
   val minSdk = 23
-  val targetSdk = 36
+  val targetSdk = 37
   val compileSdk = targetSdk
 }
