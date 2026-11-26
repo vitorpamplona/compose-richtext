@@ -4,6 +4,10 @@ plugins {
 }
 
 kotlin {
+  // iOS for Amethyst's shared UI. Only the pure-Compose modules: the markdown parsers are JVM-only.
+  iosArm64()
+  iosSimulatorArm64()
+
   android {
     namespace = "com.halilibo.richtext.ui"
   }
@@ -25,6 +29,17 @@ kotlin {
     }
     val jvmMain by getting {
       dependsOn(jvmAndroidMain)
+    }
+
+    // Wired by hand like the source sets above, which turn off the default hierarchy.
+    val iosMain by creating {
+      dependsOn(commonMain)
+    }
+    val iosArm64Main by getting {
+      dependsOn(iosMain)
+    }
+    val iosSimulatorArm64Main by getting {
+      dependsOn(iosMain)
     }
   }
 }

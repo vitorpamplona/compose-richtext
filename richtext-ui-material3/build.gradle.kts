@@ -4,6 +4,10 @@ plugins {
 }
 
 kotlin {
+  // iOS for Amethyst's shared UI. Only the pure-Compose modules: the markdown parsers are JVM-only.
+  iosArm64()
+  iosSimulatorArm64()
+
   android {
     namespace = "com.halilibo.richtext.ui.material3"
   }
